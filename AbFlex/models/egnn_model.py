@@ -280,6 +280,7 @@ class flexEGNN(pl.LightningModule):
     
 
     def on_test_epoch_end(self):
+        print(self.preds, self.targets)
         roc, pr_auc = self.epoch_metrics(self.preds, self.targets)
         self.log(f'roc_auc/test', roc, on_step=False, on_epoch=True)
         self.log(f'pr_auc/test', pr_auc, on_step=False, on_epoch=True)
