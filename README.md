@@ -57,3 +57,9 @@ from AbFlex import classify
 
 classify(infile='path/to/input.csv', outfile='path/to/output.csv')
 ```
+
+The input file should be a csv file with the following columns:
+
+| index | pdb | ab_chains | chain | resi_start | resi_end |
+| ----- | --- | --------- | ----- | ---------- | -------- |
+| 0     | /path/to/structure.pdb | labels of all chains included in context (i.e. heavy & light chain) | chain with loop | first residue of loop | last residue of loop |
