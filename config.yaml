@@ -1,0 +1,61 @@
+#save_dir: /data/localhost/not-backed-up/nvme00/spoendli/Graphlexibility/data/EGNN_training_outputs/ #tmp/
+#save_dir: /data/scratch/spoendli/Graphlexibility/data/EGNN_training_outputs/
+save_dir: /vols/opig/users/spoendli/AbFlex/scratch
+name: '0'
+restore: False
+test: False
+
+logger_params:
+  entity: f-spoendlin
+  group:  testtest
+  log_interval: 10
+  print_interval: 50
+  project: graphlexibility_align_loops
+
+model: flexEGNN
+model_params:
+  num_node_features: 22
+  lr: 2.e-4
+  weight_decay: 1.e-6
+  dropout: 0.2
+  num_edge_features: 9
+  egnn_layer_hidden_nfs: [128,128,128]
+  embedding_in_nf: 128
+  embedding_out_nf: 128
+  num_classes: 1    
+  attention: False
+  residual: True
+  normalize: False
+  tanh: True
+  update_coords: True
+  scheduler: CosineAnnealing
+  norm_nodes: None
+  reload_best_model: False
+
+trainer_params:
+  accumulate_grad_batches: 1
+  max_epochs: 2
+  accelerator: 'auto'
+  num_nodes: 1
+  gradient_clip_val: 10 # comment out whole line to remove grad clipping
+
+loader_params:
+  batch_size: 32
+  num_workers: 4
+  balanced_sampling: False
+
+dataset_params:
+  rotate: False
+  cache_frames: False
+  graph_generation_mode: loop_context
+  interaction_dist: 10
+  typing_mode: res_type
+  edge_encoding: ['covalent', 'rbf']
+  aa_map_mode: 'extended'
+  input_files:
+    train:
+      - /vols/opig/users/spoendli/data/pdb_loop_datasets/train_no_overlap_realdssp_EGNN_5_strucs_per_seq.csv
+    val:
+      - /vols/opig/users/spoendli/data/pdb_loop_datasets/val_no_overlap_realdssp_EGNN.csv
+    test:
+      - /vols/opig/users/spoendli/data/pdb_loop_datasets/test_EGNN.csv
