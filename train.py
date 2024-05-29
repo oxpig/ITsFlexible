@@ -9,7 +9,6 @@ from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from AbFlex.models.egnn_model import flexEGNN
 
 def main(config: dict):
-    # os.environ["WANDB_SILENT"] = "true"
     logger = WandbLogger(
         save_dir=Path(config['save_dir']),
         name=f"{config['name']}",
@@ -69,8 +68,7 @@ def main(config: dict):
 
     if config['test']:
         # load best model
-        checkpoint_path = glob.glob(config['save_dir'] +
-                                f'{config["logger_params"]["project"]}/**/checkpoints/*.ckpt')[0]
+        checkpoint_path = glob.glob(config['save_dir'] + '**/checkpoints/*.ckpt')[0]
         checkpoint = torch.load(checkpoint_path)
         model.load_state_dict(checkpoint['state_dict'])
         
@@ -80,13 +78,11 @@ def main(config: dict):
 
 
 if __name__ == "__main__":
-    with open('config.yaml') as yaml_file_handle:
+    with open('AbFlex/trained_model/config.yaml') as yaml_file_handle:
         config = yaml.safe_load(yaml_file_handle)
     config = defaultdict(lambda: None, config)
 
     config['save_dir'] = (config['save_dir'] + '/' +
-                          config['logger_params']['project'] + '/' +
-                          config['logger_params']['group'] + '/' +
                           config['name'] + '/')
                           
     Path(config['save_dir']).mkdir(exist_ok=True, parents=True)

@@ -1,6 +1,6 @@
 #save_dir: /data/localhost/not-backed-up/nvme00/spoendli/Graphlexibility/data/EGNN_training_outputs/ #tmp/
 #save_dir: /data/scratch/spoendli/Graphlexibility/data/EGNN_training_outputs/
-save_dir: /vols/opig/users/spoendli/AbFlex/scratch
+save_dir: scratch
 name: '0'
 restore: False
 test: False

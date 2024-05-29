@@ -10,9 +10,9 @@ from AbFlex.base.dataset import LoopGraphDataSet
 
 
 def main():
-    config_path = 'config.yaml'
-    dataset_path = '/vols/opig/users/spoendli/data/CDRH3_datasets/5_pdbs/CDRH3_Fv_all_EGNN_dssp_both_chains.csv'
-    checkpoint_path = 'AbFlex/model_weights/align_loop_top.ckpt'
+    config_path = 'AbFlex/trained_model/config.yaml'
+    dataset_path = 'data/CDRH3_test_align_loop.csv'
+    checkpoint_path = 'AbFlex/trained_model/align_loop_top.ckpt'
     
     with open(config_path) as f:
         config = yaml.safe_load(f)
@@ -35,9 +35,9 @@ def main():
     preds = trainer.predict(model=model, dataloaders=loader, return_predictions=True)
     preds = np.concatenate(preds)
 
-    df = pd.read_csv(dataset_path)
+    df = pd.read_csv(dataset_path, index_col=0)
     df['preds'] = preds
-    df.to_csv('predictions.csv', index=False)
+    df.to_csv('predictions.csv')
 
 
 if __name__ == "__main__":
