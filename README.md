@@ -16,12 +16,6 @@ Proteins are highly flexible macromolecules and the ability to adapt their shape
 
 ## Installation
 
-First, clone the repository:
-
-```bash
-git clone https://github.com/fspoendlin/AbFlex.git
-```
-
 Create a conda environment:
 
 ```bash
@@ -43,7 +37,7 @@ cd AbFlex
 pip install .
 ```
 
-Install torch geometric for the correct version of your system (see [pytorch-geometric.org](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html)). For cpu only, use::
+Install torch geometric for the correct version of your system (see [pytorch-geometric.org](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html)). For cpu only, use:
 
 ```bash
 pip install torch_geometric
