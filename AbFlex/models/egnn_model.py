@@ -277,39 +277,35 @@ class flexEGNN(pl.LightningModule):
         self.test_set_predictions += output_preds
 
         return {'loss': loss, 'pred': pred, 'y': y}
-    
 
     def on_test_epoch_end(self):
         print(self.preds, self.targets)
         roc, pr_auc = self.epoch_metrics(self.preds, self.targets)
-        self.log(f'roc_auc/test', roc, on_step=False, on_epoch=True)
-        self.log(f'pr_auc/test', pr_auc, on_step=False, on_epoch=True)
+        self.log('roc_auc/test', roc, on_step=False, on_epoch=True)
+        self.log('pr_auc/test', pr_auc, on_step=False, on_epoch=True)
 
         self.preds = []
         self.targets = []
-
 
     def predict_step(self, batch):
         pred = self.forward(batch)
         pred = sigmoid(pred)
         return to_np(pred)
 
-
     def epoch_metrics(self, predictions, targets):
         preds = to_np(torch.cat(predictions, dim=0))
         targets = to_np(torch.cat(targets, dim=0))
-    
+
         try:
             roc = roc_auc_score(y_true=targets, y_score=preds)
             precision, recall, thresholds = precision_recall_curve(y_true=targets, y_score=preds)
             pr_auc = auc(recall, precision)
 
-        except:
+        except Exception:
             roc = None
             pr_auc = None
-        
-        return roc, pr_auc
 
+        return roc, pr_auc
 
     def log_best_model_val_metrics(self):
         """Log best validation epoch and metrics"""
