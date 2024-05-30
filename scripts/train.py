@@ -8,6 +8,7 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from AbFlex.models.egnn_model import flexEGNN
 
+
 def main(config: dict):
     logger = WandbLogger(
         save_dir=Path(config['save_dir']),
@@ -26,7 +27,7 @@ def main(config: dict):
             save_dir=config['save_dir'],
             **config['model_params']
         )
-    
+
     checkpoint_callback = ModelCheckpoint(
         monitor='pr_auc/val',
         mode='max',
@@ -44,7 +45,6 @@ def main(config: dict):
         callbacks=[checkpoint_callback, early_stop_callback],
         **config['trainer_params'])
 
-
     # load model from checkpoint
     if config['restore']:
         print("Loading checkpoint & restoring for continued training")
@@ -54,27 +54,30 @@ def main(config: dict):
             loader_config=config['loader_params'],
             trainer_config=config['trainer_params'],
             **config['model_params'])
-        
+
         trainer.resume_from_checkpoint = config['restore']
 
-    
     trainer.fit(model)
     # save final model parameters
     torch.save({
         'epoch': trainer.current_epoch,
         'model_state_dict': model.state_dict(),
-        }, config['save_dir'] + f"checkpoint_final.pt")
-
+        }, config['save_dir'] + "checkpoint_final.pt")
 
     if config['test']:
         # load best model
-        checkpoint_path = glob.glob(config['save_dir'] + '**/checkpoints/*.ckpt')[0]
+        checkpoint_path = glob.glob(
+            config['save_dir'] + '/' +
+            config['logger_params']['project'] + '/' +
+            '**/checkpoints/*.ckpt')[0]
         checkpoint = torch.load(checkpoint_path)
         model.load_state_dict(checkpoint['state_dict'])
-        
+
         model.test_set_predictions = []
         trainer.test(model)
-        model.save_test_predictions(Path(config['save_dir']) / f"test_preds.csv")
+        model.save_test_predictions(Path(
+            config['save_dir']) / "test_preds.csv"
+            )
 
 
 if __name__ == "__main__":
@@ -84,7 +87,7 @@ if __name__ == "__main__":
 
     config['save_dir'] = (config['save_dir'] + '/' +
                           config['name'] + '/')
-                          
+
     Path(config['save_dir']).mkdir(exist_ok=True, parents=True)
 
     main(config)

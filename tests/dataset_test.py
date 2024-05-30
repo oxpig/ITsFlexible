@@ -1,10 +1,6 @@
 '''Test LoopGraphDataSet class'''
-
 import unittest
 import numpy as np
-import sys
-
-sys.path.append('../')
 from AbFlex.base.dataset import LoopGraphDataSet
 
 
@@ -24,7 +20,6 @@ class TestLoopContext(unittest.TestCase):
                          [1, 0, 0, 1, 1, 1, 0, 0, 0, 1,
                           0, 1, 0, 2, 0, 0, 0, 0, 0, 0,
                           0])
-
 
     def test_edge_features_dimensions(self):
         # test correct shape of edge features
@@ -64,7 +59,6 @@ class TestLoopContext(unittest.TestCase):
         graph = ds[0]
         self.assertEqual(graph.edge_attr.shape[1], 9)
 
-
     def test_edge_features(self):
         ds = LoopGraphDataSet(interaction_dist=10,
                               graph_mode='loop_context',
@@ -77,7 +71,9 @@ class TestLoopContext(unittest.TestCase):
 
         # edges are bidirectional
         for i in range(ds[0].edge_index.max().item()):
-            self.assertTrue((ds[0].edge_attr[np.where(ds[0].edge_index[0] == i)] == ds[0].edge_attr[np.where(ds[0].edge_index[1] == i)]).all())
+            self.assertTrue(
+                (ds[0].edge_attr[np.where(ds[0].edge_index[0] == i)] ==
+                 ds[0].edge_attr[np.where(ds[0].edge_index[1] == i)]).all())
 
         # correct encoding
         # intra/inter
@@ -85,22 +81,29 @@ class TestLoopContext(unittest.TestCase):
         self.assertEqual(graph.edge_attr[2:32].sum(axis=0)[0], 30)
         self.assertEqual(graph.edge_attr[32:].sum(axis=0)[0], 0)
         # intra/intra/inter
-        self.assertEqual(graph.edge_attr[:2].sum(axis=0)[1:4].tolist(), [2.,0.,0.])
-        self.assertEqual(graph.edge_attr[2:32].sum(axis=0)[1:4].tolist(), [0.,30.,0.])
-        self.assertEqual(graph.edge_attr[32:].sum(axis=0)[1:4].tolist(), [0.,0.,20.])
+        self.assertEqual(
+            graph.edge_attr[:2].sum(axis=0)[1:4].tolist(), [2., 0., 0.]
+            )
+        self.assertEqual(
+            graph.edge_attr[2:32].sum(axis=0)[1:4].tolist(), [0., 30., 0.]
+            )
+        self.assertEqual(
+            graph.edge_attr[32:].sum(axis=0)[1:4].tolist(), [0., 0., 20.]
+            )
         # covalent
         self.assertEqual(graph.edge_attr.sum(axis=0)[4], 14)
         # all
-        self.assertEqual(graph.edge_attr.sum(axis=0)[:5].tolist(), [32, 2, 30, 20, 14])
-
+        self.assertEqual(
+            graph.edge_attr.sum(axis=0)[:5].tolist(), [32, 2, 30, 20, 14]
+            )
 
     def test_rbf_encodings(self):
         # test correct rbf distance encoding
-        distances = np.arange(0,11,1)
+        distances = np.arange(0, 11, 1)
         ds = LoopGraphDataSet()
         distance_encodings = ds._rbf(distances, count=11)
         # diagonal should be 1
-        distance_encodings = np.diag(distance_encodings)        
+        distance_encodings = np.diag(distance_encodings)
         self.assertTrue((distance_encodings == np.ones(11)).all())
 
     def test_predict(self):
@@ -112,7 +115,7 @@ class TestLoopContext(unittest.TestCase):
 
 
 class TestLoop(unittest.TestCase):
-    
+
     def test_node_features(self):
         ds = LoopGraphDataSet(interaction_dist=10,
                               graph_mode='loop')
@@ -121,7 +124,6 @@ class TestLoop(unittest.TestCase):
 
         self.assertEqual(graph.x.shape, (2, 21))
 
-    
     def test_edge_features(self):
         ds = LoopGraphDataSet(interaction_dist=10,
                               graph_mode='loop',
@@ -140,4 +142,6 @@ class TestLoop(unittest.TestCase):
 
         # correct encoding
         # all
-        self.assertEqual(graph.edge_attr.sum(axis=0)[:5].tolist(), [2, 2, 0, 0, 2])
+        self.assertEqual(
+            graph.edge_attr.sum(axis=0)[:5].tolist(), [2, 2, 0, 0, 2]
+            )

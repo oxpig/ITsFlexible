@@ -26,22 +26,22 @@ class E_GCL(nn.Module):
     E(n) Equivariant Convolutional Layer
     re
 
-    Adapted from https://github.com/vgsatorras/egnn/blob/main/models/egnn_clean/egnn_clean.py (Satorras et al., 2019)
+    Adapted from Satorras et al., 2019
     """
 
     def __init__(
-        self, 
-        input_nf, 
-        output_nf, 
-        hidden_nf, 
-        edges_in_d=0, 
-        act_fn=nn.SiLU(), 
-        residual=True, 
-        attention=False, 
-        normalize=False, 
-        coords_agg='mean', 
-        tanh=False,
-        norm_nodes=None):
+            self,
+            input_nf,
+            output_nf,
+            hidden_nf,
+            edges_in_d=0,
+            act_fn=nn.SiLU(),
+            residual=True,
+            attention=False,
+            normalize=False,
+            coords_agg='mean',
+            tanh=False,
+            norm_nodes=None):
         super(E_GCL, self).__init__()
         input_edge = input_nf * 2
         self.residual = residual
@@ -76,7 +76,6 @@ class E_GCL(nn.Module):
         self.node_mlp2 = nn.Sequential(
             nn.Linear(hidden_nf, output_nf))
 
-
         layer = nn.Linear(hidden_nf, 1, bias=False)
         torch.nn.init.xavier_uniform_(layer.weight, gain=0.001)
 
@@ -92,7 +91,6 @@ class E_GCL(nn.Module):
             self.att_mlp = nn.Sequential(
                 nn.Linear(hidden_nf, 1),
                 nn.Sigmoid())
-
 
     def edge_model(self, source, target, radial, edge_attr, batch):
         if edge_attr is None:  # Unused.
@@ -144,7 +142,14 @@ class E_GCL(nn.Module):
 
         return radial, coord_diff
 
-    def forward(self, h, edge_index, coord, edge_attr=None, node_attr=None, batch=None):
+    def forward(
+            self,
+            h,
+            edge_index,
+            coord,
+            edge_attr=None,
+            node_attr=None,
+            batch=None):
         row, col = edge_index
         radial, coord_diff = self.coord2radial(edge_index, coord)
         edge_feat = self.edge_model(h[row], h[col], radial, edge_attr, batch)
@@ -155,7 +160,18 @@ class E_GCL(nn.Module):
 
 
 class EGNN(nn.Module):
-    def __init__(self, in_node_nf, hidden_nf, out_node_nf, in_edge_nf=0, device='cpu', act_fn=nn.SiLU(), n_layers=4, residual=True, attention=False, normalize=False, tanh=False):
+    def __init__(self,
+                 in_node_nf,
+                 hidden_nf,
+                 out_node_nf,
+                 in_edge_nf=0,
+                 device='cpu',
+                 act_fn=nn.SiLU(),
+                 n_layers=4,
+                 residual=True,
+                 attention=False,
+                 normalize=False,
+                 tanh=False):
         '''
 
         :param in_node_nf: Number of features for 'h' at the input
@@ -165,18 +181,19 @@ class EGNN(nn.Module):
         :param device: Device (e.g. 'cpu', 'cuda:0',...)
         :param act_fn: Non-linearity
         :param n_layers: Number of layer for the EGNN
-        :param residual: Use residual connections, we recommend not changing this one
+        :param residual: Use residual connections, we recommend not changing
         :param attention: Whether using attention or not
         :param normalize: Normalizes the coordinates messages such that:
-                    instead of: x^{l+1}_i = x^{l}_i + Σ(x_i - x_j)phi_x(m_ij)
-                    we get:     x^{l+1}_i = x^{l}_i + Σ(x_i - x_j)phi_x(m_ij)/||x_i - x_j||
-                    We noticed it may help in the stability or generalization in some future works.
-                    We didn't use it in our paper.
-        :param tanh: Sets a tanh activation function at the output of phi_x(m_ij). I.e. it bounds the output of
-                        phi_x(m_ij) which definitely improves in stability but it may decrease in accuracy.
-                        We didn't use it in our paper.
+        instead of: x^{l+1}_i = x^{l}_i + Σ(x_i - x_j)phi_x(m_ij)
+        we get:     x^{l+1}_i = x^{l}_i + Σ(x_i - x_j)phi_x(m_ij)/||x_i - x_j||
+        We noticed it may help in the stability or generalization in some
+        future works. We didn't use it in our paper.
+        :param tanh: Sets a tanh activation function at the output of
+            phi_x(m_ij). I.e. it bounds the output of phi_x(m_ij) which
+            definitely improves in stability but it may decrease in
+            accuracy. We didn't use it in our paper.
 
-        Adapted from https://github.com/vgsatorras/egnn/blob/main/models/egnn_clean/egnn_clean.py (Satorras et al., 2019)
+        Adapted from Satorras et al., 2019
         '''
 
         super(EGNN, self).__init__()
@@ -186,14 +203,22 @@ class EGNN(nn.Module):
         self.embedding_in = nn.Linear(in_node_nf, self.hidden_nf)
         self.embedding_out = nn.Linear(self.hidden_nf, out_node_nf)
         for i in range(0, n_layers):
-            self.add_module("gcl_%d" % i, E_GCL(self.hidden_nf, self.hidden_nf, self.hidden_nf, edges_in_d=in_edge_nf,
-                                                act_fn=act_fn, residual=residual, attention=attention,
-                                                normalize=normalize, tanh=tanh))
+            self.add_module("gcl_%d" % i,
+                            E_GCL(self.hidden_nf,
+                                  self.hidden_nf,
+                                  self.hidden_nf,
+                                  edges_in_d=in_edge_nf,
+                                  act_fn=act_fn,
+                                  residual=residual,
+                                  attention=attention,
+                                  normalize=normalize,
+                                  tanh=tanh))
         # self.to(self.device)
 
     def forward(self, h, x, edges, edge_attr):
         h = self.embedding_in(h)
         for i in range(0, self.n_layers):
-            h, x, _ = self._modules["gcl_%d" % i](h, edges, x, edge_attr=edge_attr)
+            h, x, _ = self._modules["gcl_%d" % i](h, edges, x,
+                                                  edge_attr=edge_attr)
         h = self.embedding_out(h)
         return h, x

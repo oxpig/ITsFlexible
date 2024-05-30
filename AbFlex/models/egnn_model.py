@@ -79,7 +79,11 @@ class flexEGNN(pl.LightningModule):
         else:
             raise NotImplementedError('Pooling function not implemented')
 
-        num_node_features = 22 if dataset_config['graph_generation_mode'] == 'loop_context' else 21
+        if dataset_config['graph_generation_mode'] == 'loop_context':
+            num_node_features = 22
+        else:
+            num_node_features = 21
+
         self.embedding_in = Linear(num_node_features, embedding_in_nf)
         self.embedding_out = Linear(embedding_in_nf, embedding_out_nf)
 
@@ -125,13 +129,12 @@ class flexEGNN(pl.LightningModule):
         if norm_nodes:
             self.graphnorm = GraphNorm(embedding_out_nf)
 
-        # empty lists for summary statistics
-        self.preds = []
-        self.targets = []
+        # empty lists for storing values
+        self.preds_train, self.preds_val, self.preds_test = [], [], []
+        self.targets_train, self.targets_val, self.targets_test = [], [], []
         self.val_roc_aucs = []
         self.val_prc_aucs = []
         self.val_epochs = []
-
 
     def forward(self, graph):
         nodes = graph.x.float()  # node features
@@ -200,24 +203,21 @@ class flexEGNN(pl.LightningModule):
                  batch_size=self.loader_config['batch_size'])
         pred = sigmoid(pred)  # sigmoid activation function for prediction
 
-        self.preds.append(pred.detach())
-        self.targets.append(y.detach())
+        self.preds_train.append(pred.detach())
+        self.targets_train.append(y.detach())
 
         return {'loss': loss, 'pred': pred, 'y': y}
 
     def on_train_epoch_end(self):
-        roc, pr_auc = self.epoch_metrics(self.preds, self.targets)
+        roc, pr_auc = self.epoch_metrics(self.preds_train, self.targets_train)
         self.log('roc_auc/train', roc, on_step=False, on_epoch=True)
         self.log('pr_auc/train', pr_auc, on_step=False, on_epoch=True)
 
-        self.preds = []
-        self.targets = []
+        self.preds_train = []
+        self.targets_train = []
 
     def on_train_end(self):
         self.log_best_model_val_metrics()
-        self.log('model/n_trainable_params',
-                 sum(p.numel() for p in self.parameters() if p.requires_grad),
-                 on_step=False, on_epoch=True)
 
     def validation_step(self, batch, batch_idx):
         y = batch.y  # true label
@@ -240,13 +240,13 @@ class flexEGNN(pl.LightningModule):
                  batch_size=self.loader_config['batch_size'])
         pred = sigmoid(pred)
 
-        self.preds.append(pred.detach())
-        self.targets.append(y.detach())
+        self.preds_val.append(pred.detach())
+        self.targets_val.append(y.detach())
 
         return {'loss': loss, 'pred': pred, 'y': y}
 
     def on_validation_epoch_end(self):
-        roc, pr_auc = self.epoch_metrics(self.preds, self.targets)
+        roc, pr_auc = self.epoch_metrics(self.preds_val, self.targets_val)
         self.log('roc_auc/val', roc, on_step=False, on_epoch=True)
         self.log('pr_auc/val', pr_auc, on_step=False, on_epoch=True)
 
@@ -254,8 +254,8 @@ class flexEGNN(pl.LightningModule):
         self.val_prc_aucs.append(pr_auc)
         self.val_epochs.append(self.current_epoch)
 
-        self.preds = []
-        self.targets = []
+        self.preds_val = []
+        self.targets_val = []
 
     def test_step(self, batch, batch_idx):
         y = batch.y  # true label
@@ -275,8 +275,8 @@ class flexEGNN(pl.LightningModule):
         loss = self.loss_fn(pred.float(), y.float())
         pred = sigmoid(pred)
 
-        self.preds.append(pred.detach())
-        self.targets.append(y.detach())
+        self.preds_test.append(pred.detach())
+        self.targets_test.append(y.detach())
 
         # save predicted output
         output_preds = []
@@ -296,13 +296,16 @@ class flexEGNN(pl.LightningModule):
         return {'loss': loss, 'pred': pred, 'y': y}
 
     def on_test_epoch_end(self):
-        print(self.preds, self.targets)
-        roc, pr_auc = self.epoch_metrics(self.preds, self.targets)
+        roc, pr_auc = self.epoch_metrics(self.preds_test, self.targets_test)
         self.log('roc_auc/test', roc, on_step=False, on_epoch=True)
         self.log('pr_auc/test', pr_auc, on_step=False, on_epoch=True)
 
-        self.preds = []
-        self.targets = []
+        self.preds_test = []
+        self.targets_test = []
+
+        self.log('model/n_trainable_params',
+                 sum(p.numel() for p in self.parameters() if p.requires_grad),
+                 on_step=False, on_epoch=True)
 
     def predict_step(self, batch):
         pred = self.forward(batch)
@@ -360,13 +363,14 @@ class flexEGNN(pl.LightningModule):
         else:
             # define scheduler
             if self.scheduler == 'CosineAnnealingWarmRestarts':
-                self.lr_scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
+                optim_CAWR = optim.lr_scheduler.CosineAnnealingWarmRestarts
+                self.lr_scheduler = optim_CAWR(
                     self.optimizer,
                     self.trainer_config['max_epochs'],
                     eta_min=1e-4)
             elif self.scheduler == 'CosineAnnealing':
                 self.lr_scheduler = optim.lr_scheduler.CosineAnnealingLR(
-                    self.optimizer, 
+                    self.optimizer,
                     self.trainer_config['max_epochs'])
             else:
                 raise NotImplementedError
@@ -386,7 +390,6 @@ class flexEGNN(pl.LightningModule):
             edge_encoding=self.dataset_config['edge_encoding'],
             aa_map_mode=self.dataset_config['aa_map_mode'],
             cache_frames=self.dataset_config['cache_frames'],
-            masking=self.masking_bool
         )
 
         for f in self.dataset_config['input_files']['test']:
@@ -409,7 +412,6 @@ class flexEGNN(pl.LightningModule):
             edge_encoding=self.dataset_config['edge_encoding'],
             aa_map_mode=self.dataset_config['aa_map_mode'],
             cache_frames=self.dataset_config['cache_frames'],
-            masking=self.masking_bool,
         )
 
         for f in self.dataset_config['input_files']['train']:
@@ -422,9 +424,9 @@ class flexEGNN(pl.LightningModule):
             shuffle = False
 
         loader = GeoDataLoader(
-            ds, 
+            ds,
             batch_size=self.loader_config['batch_size'],
-            shuffle=shuffle, 
+            shuffle=shuffle,
             num_workers=self.loader_config['num_workers'],
             sampler=sampler)
 
@@ -441,7 +443,6 @@ class flexEGNN(pl.LightningModule):
             edge_encoding=self.dataset_config['edge_encoding'],
             aa_map_mode=self.dataset_config['aa_map_mode'],
             cache_frames=self.dataset_config['cache_frames'],
-            masking=self.masking_bool,
         )
 
         for f in self.dataset_config['input_files']['val']:

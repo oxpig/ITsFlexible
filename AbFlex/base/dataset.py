@@ -162,7 +162,8 @@ class LoopGraphDataSet(Dataset):
         elif mode == 'res_type':
             types = df['residue_name']
             types = types.apply(
-                lambda x: self.aa_map[x] if x in self.aa_map.keys() else 20).astype(np.int64)
+                lambda x: self.aa_map[x] if x in self.aa_map.keys() else 20)
+            types = types.astype(np.int64)
             types = np.array(types)
             types = utils.get_one_hot(
                 types, nb_classes=max(self.aa_map.values()) + 1
@@ -192,9 +193,11 @@ class LoopGraphDataSet(Dataset):
         edge_attr = np.zeros(
             (len(intra_dst_loop)+len(intra_dst_context) +
              len(inter_dst_context)+len(inter_dst_context), 3))
-        edge_attr[:len(intra_dst_loop), 0] = 1
-        edge_attr[len(intra_dst_loop):len(intra_dst_loop)+len(intra_dst_context):, 1] = 1
-        edge_attr[len(intra_dst_loop)+len(intra_dst_context):, 2] = 1
+        start = len(intra_dst_loop)
+        end = len(intra_dst_loop)+len(intra_dst_context)
+        edge_attr[:start, 0] = 1
+        edge_attr[start:end, 1] = 1
+        edge_attr[end:, 2] = 1
         return edge_attr
 
     def _edge_attr_covalent(self, loop_nodes, context_nodes, intra_src_loop,
@@ -299,8 +302,7 @@ class LoopGraphDataSet(Dataset):
                 [dist_intra_loop[intra_src_loop, intra_dst_loop],
                  dist_intra_context[intra_src_context, intra_dst_context],
                  dist_inter[inter_src_loop, inter_dst_context],
-                 dist_inter[inter_src_loop, inter_dst_context]
-                ])
+                 dist_inter[inter_src_loop, inter_dst_context]])
 
         elif self.graph_mode == 'loop':
             intra_src_context, intra_dst_context = [], []
@@ -344,7 +346,8 @@ class LoopGraphDataSet(Dataset):
         in graph
         """
         graph_dict = {}
-        nodes, edge_ind, edge_attr = self.graph_generation_function_dict[self.graph_mode](prot_df, loop_chain, loop_resi)
+        graph_func = self.graph_generation_function_dict[self.graph_mode]
+        nodes, edge_ind, edge_attr = graph_func(prot_df, loop_chain, loop_resi)
 
         graph_dict['nodes'] = nodes
         graph_dict['edge_ind'] = edge_ind
@@ -437,8 +440,8 @@ class LoopGraphDataSet(Dataset):
 
         # check if typed file in cache
         if (self.cache_frames and
-            str(typed_pdb) in self.cache and not
-            force_recalc):
+                str(typed_pdb) in self.cache and not
+                force_recalc):
             pdb_df = self.cache[str(typed_pdb)].copy()
 
         # check if typed file exists

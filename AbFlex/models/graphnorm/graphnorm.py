@@ -8,9 +8,11 @@ def zeros(tensor):
     if tensor is not None:
         tensor.data.fill_(0)
 
+
 def ones(tensor):
     if tensor is not None:
         tensor.data.fill_(1)
+
 
 class GraphNorm(torch.nn.Module):
     r"""Applies graph normalization over individual graphs as described in the
@@ -48,10 +50,9 @@ class GraphNorm(torch.nn.Module):
         zeros(self.bias)
         ones(self.mean_scale)
 
-
     def forward(self, x: Tensor, batch: Optional[Tensor] = None) -> Tensor:
         """"""
-        
+
         if batch is None:
             batch = x.new_zeros(x.size(0), dtype=torch.long)
 

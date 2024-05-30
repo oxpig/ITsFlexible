@@ -1,14 +1,14 @@
 save_dir: scratch
 name: '0'
 restore: False
-test: False
+test: True
 
 logger_params:
   entity: f-spoendlin
-  group:  testtest
+  group:  test
   log_interval: 10
   print_interval: 50
-  project: graphlexibility_align_loops
+  project: test
 
 model: flexEGNN
 model_params:
@@ -32,7 +32,7 @@ model_params:
 
 trainer_params:
   accumulate_grad_batches: 1
-  max_epochs: 2
+  max_epochs: 200
   accelerator: 'auto'
   num_nodes: 1
   gradient_clip_val: 10 # comment out whole line to remove grad clipping
