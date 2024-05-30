@@ -13,7 +13,7 @@ from torch_geometric.loader import DataLoader as GeoDataLoader
 from torch_geometric.nn import global_max_pool, global_mean_pool
 from AbFlex.base.dataset import LoopGraphDataSet
 from AbFlex.models.graphnorm.graphnorm import GraphNorm
-from AbFlex.models.egnn.egnn import E_GCL, EGNN
+from AbFlex.models.egnn.egnn import E_GCL
 
 
 def to_np(x):
@@ -27,15 +27,15 @@ class flexEGNN(pl.LightningModule):
         dataset_config: dict,
         trainer_config: dict,
         num_edge_features: int = 9,
-        embedding_in_nf: int = 128, # num features of embedding in
-        embedding_out_nf: int = 128, # num features of embedding out
-        egnn_layer_hidden_nfs: list = [128,128,128], # number and dimension of hidden layers
-        num_classes: int=1, # dimension of output
-        opt: str='adam',
-        loss: str='bce_logits',
-        scheduler: str=None,
-        lr: float=10e-3,
-        dropout: float=0.0,
+        embedding_in_nf: int = 128,  # num features of embedding in
+        embedding_out_nf: int = 128,  # num features of embedding out
+        egnn_layer_hidden_nfs: list = [128, 128, 128],  # n and dim of layers
+        num_classes: int = 1,  # dimension of output
+        opt: str = 'adam',
+        loss: str = 'bce_logits',
+        scheduler: str = None,
+        lr: float = 10e-3,
+        dropout: float = 0.0,
         balanced_loss: bool = False,
         attention: bool = False,
         residual: bool = True,
@@ -46,7 +46,7 @@ class flexEGNN(pl.LightningModule):
         norm: str = None,
         norm_nodes: str = None,
         pooling: str = 'max',
-        pool_first: bool = True, # pool before or after passing to last linear layer
+        pool_first: bool = True,  # pool before or after last linear layer
         reload_best_model: bool = False,
         save_dir: str = None,
         **kwargs,
@@ -61,8 +61,10 @@ class flexEGNN(pl.LightningModule):
         self.reload_best_model = reload_best_model
         self.save_dir = save_dir
 
-        try: self.masking_bool = self.dataset_config['masking']
-        except: self.masking_bool = False
+        try:
+            self.masking_bool = self.dataset_config['masking']
+        except Exception:
+            self.masking_bool = False
 
         # this is for the inheriting models
         self.embedding_out_nf = embedding_out_nf
@@ -90,9 +92,9 @@ class flexEGNN(pl.LightningModule):
         egnn_layers = []
         for hidden_nf in egnn_layer_hidden_nfs:
             layer = E_GCL(
-                embedding_in_nf, 
-                hidden_nf, 
-                embedding_in_nf, 
+                embedding_in_nf,
+                hidden_nf,
+                embedding_in_nf,
                 edges_in_d=num_edge_features,
                 act_fn=nn.SiLU(),
                 attention=attention,
@@ -132,25 +134,37 @@ class flexEGNN(pl.LightningModule):
 
 
     def forward(self, graph):
-        nodes = graph.x.float() # node features
+        nodes = graph.x.float()  # node features
         edge_ind = graph.edge_index
-        coords = graph.pos.float() # coords
+        coords = graph.pos.float()  # coords
         edge_attr = graph.edge_attr.float()
 
         nodes = self.embedding_in(nodes)
 
         for egnn_layer in self.egnn_layers:
-            edge_ind_post_dropout, edge_mask = dropout_edge(edge_ind, p=self.dropout, training=self.training) # randomly drops edges from adjacency matrix; default dropout probability (p) set to 0
+            # randomly drops edges from adjacency matrix
+            edge_ind_post_dropout, edge_mask = dropout_edge(
+                edge_ind, p=self.dropout, training=self.training
+                )
             edge_attr_post_dropout = edge_attr[edge_mask]
 
             # update node features (and, if update_coords=True, coordinates)
             if self.update_coords:
-                nodes, coords, _ = egnn_layer(nodes, edge_ind_post_dropout, coords, edge_attr_post_dropout, batch=graph.batch)
+                nodes, coords, _ = egnn_layer(nodes,
+                                              edge_ind_post_dropout,
+                                              coords,
+                                              edge_attr_post_dropout,
+                                              batch=graph.batch)
             else:
-                nodes, _, _ = egnn_layer(nodes, edge_ind_post_dropout, coords, edge_attr_post_dropout, batch=graph.batch)
+                nodes, _, _ = egnn_layer(nodes,
+                                         edge_ind_post_dropout,
+                                         coords,
+                                         edge_attr_post_dropout,
+                                         batch=graph.batch)
 
         if self.norm_nodes:
-            nodes = self.graphnorm(relu(self.embedding_out(nodes)), graph.batch)
+            nodes = self.graphnorm(relu(self.embedding_out(nodes)),
+                                   graph.batch)
 
         if self.pool_first:
             graph_vector = self.pooling_fn(nodes, graph.batch)
@@ -161,9 +175,8 @@ class flexEGNN(pl.LightningModule):
 
         return out
 
-
     def training_step(self, batch, batch_idx):
-        y = batch.y # true label
+        y = batch.y  # true label
 
         batch_idx = sorted(batch.batch.unique())
         batch_repl = {}
@@ -179,18 +192,18 @@ class flexEGNN(pl.LightningModule):
         if y.shape != pred.shape:
             try:
                 y = y.view_as(pred)
-            except:
+            except Exception:
                 pass
 
         loss = self.loss_fn(pred.float(), y.float())
-        self.log('Loss/train', loss, on_step=False, on_epoch=True, batch_size=self.loader_config['batch_size'])
-        pred = sigmoid(pred) # sigmoid activation function for prediction
+        self.log('Loss/train', loss, on_step=False, on_epoch=True,
+                 batch_size=self.loader_config['batch_size'])
+        pred = sigmoid(pred)  # sigmoid activation function for prediction
 
         self.preds.append(pred.detach())
         self.targets.append(y.detach())
 
         return {'loss': loss, 'pred': pred, 'y': y}
-    
 
     def on_train_epoch_end(self):
         roc, pr_auc = self.epoch_metrics(self.preds, self.targets)
@@ -200,15 +213,15 @@ class flexEGNN(pl.LightningModule):
         self.preds = []
         self.targets = []
 
-
     def on_train_end(self):
         self.log_best_model_val_metrics()
-        self.log('model/n_trainable_params', sum(p.numel() for p in self.parameters() if p.requires_grad), on_step=False, on_epoch=True)
-
+        self.log('model/n_trainable_params',
+                 sum(p.numel() for p in self.parameters() if p.requires_grad),
+                 on_step=False, on_epoch=True)
 
     def validation_step(self, batch, batch_idx):
-        y = batch.y # true label
-        
+        y = batch.y  # true label
+
         batch_idx = sorted(batch.batch.unique())
         batch_repl = {}
         for i, b in enumerate(batch_idx):
@@ -223,14 +236,14 @@ class flexEGNN(pl.LightningModule):
         if y.shape != pred.shape:
             y = y.view_as(pred)
         loss = self.loss_fn(pred.float(), y.float())
-        self.log('Loss/val', loss, on_step=False, on_epoch=True, batch_size=self.loader_config['batch_size'])
+        self.log('Loss/val', loss, on_step=False, on_epoch=True,
+                 batch_size=self.loader_config['batch_size'])
         pred = sigmoid(pred)
 
         self.preds.append(pred.detach())
         self.targets.append(y.detach())
 
         return {'loss': loss, 'pred': pred, 'y': y}
-
 
     def on_validation_epoch_end(self):
         roc, pr_auc = self.epoch_metrics(self.preds, self.targets)
@@ -244,9 +257,8 @@ class flexEGNN(pl.LightningModule):
         self.preds = []
         self.targets = []
 
-
     def test_step(self, batch, batch_idx):
-        y = batch.y # true label
+        y = batch.y  # true label
 
         batch_idx = sorted(batch.batch.unique())
         batch_repl = {}
@@ -271,7 +283,12 @@ class flexEGNN(pl.LightningModule):
         labels = to_np(y).flatten()
         for ind, score in enumerate(to_np(pred)):
             if self.masking_bool:
-                output_preds.append((batch.pdb_file[ind], batch.masked_cdrh3_res[ind], score, labels[ind]))
+                output_preds.append((
+                    batch.pdb_file[ind],
+                    batch.masked_cdrh3_res[ind],
+                    score,
+                    labels[ind]
+                    ))
             else:
                 output_preds.append((batch.pdb_file[ind], score, labels[ind]))
         self.test_set_predictions += output_preds
@@ -298,7 +315,9 @@ class flexEGNN(pl.LightningModule):
 
         try:
             roc = roc_auc_score(y_true=targets, y_score=preds)
-            precision, recall, thresholds = precision_recall_curve(y_true=targets, y_score=preds)
+            precision, recall, thresholds = precision_recall_curve(
+                y_true=targets, y_score=preds
+                )
             pr_auc = auc(recall, precision)
 
         except Exception:
@@ -316,11 +335,10 @@ class flexEGNN(pl.LightningModule):
             'roc_auc/val_best': self.val_roc_aucs[best_ind],
         })
 
-
     def save_test_predictions(self, filename: Path):
         """
         Save test predictions to csv file
-        
+
         Args:
             filename (Path): path to output file
         """
@@ -329,10 +347,11 @@ class flexEGNN(pl.LightningModule):
             for p in self.test_set_predictions:
                 outf.write(f'{p[0]},{p[1]},{p[2]}\n')
 
-                
     def configure_optimizers(self):
         if self.opt == 'adam':
-            self.optimizer = optim.Adam(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+            self.optimizer = optim.Adam(
+                self.parameters(), lr=self.lr, weight_decay=self.weight_decay
+                )
         else:
             raise NotImplementedError
 
@@ -349,13 +368,12 @@ class flexEGNN(pl.LightningModule):
                 self.lr_scheduler = optim.lr_scheduler.CosineAnnealingLR(
                     self.optimizer, 
                     self.trainer_config['max_epochs'])
-            else: 
+            else:
                 raise NotImplementedError
             return {
                 'optimizer': self.optimizer,
                 'lr_scheduler': self.lr_scheduler,
             }
-    
 
     def test_dataloader(self):
         if self.dataset_config['input_files']['test'] is None:
@@ -374,17 +392,16 @@ class flexEGNN(pl.LightningModule):
         for f in self.dataset_config['input_files']['test']:
             ds.populate(f, overwrite=False)
         loader = GeoDataLoader(
-            ds, 
-            batch_size=self.loader_config['batch_size'], 
+            ds,
+            batch_size=self.loader_config['batch_size'],
             shuffle=False,
             num_workers=self.loader_config['num_workers'])
         return loader
 
-    
     def train_dataloader(self):
         if self.dataset_config['input_files']['train'] is None:
             return None
-        
+
         ds = LoopGraphDataSet(
             interaction_dist=self.dataset_config['interaction_dist'],
             graph_mode=self.dataset_config['graph_generation_mode'],
@@ -406,18 +423,17 @@ class flexEGNN(pl.LightningModule):
 
         loader = GeoDataLoader(
             ds, 
-            batch_size=self.loader_config['batch_size'],  
+            batch_size=self.loader_config['batch_size'],
             shuffle=shuffle, 
             num_workers=self.loader_config['num_workers'],
             sampler=sampler)
-        
-        return loader
 
+        return loader
 
     def val_dataloader(self):
         if self.dataset_config['input_files']['val'] is None:
             return None
-                
+
         ds = LoopGraphDataSet(
             interaction_dist=self.dataset_config['interaction_dist'],
             graph_mode=self.dataset_config['graph_generation_mode'],
@@ -431,8 +447,8 @@ class flexEGNN(pl.LightningModule):
         for f in self.dataset_config['input_files']['val']:
             ds.populate(f, overwrite=False)
         loader = GeoDataLoader(
-            ds, 
-            batch_size=self.loader_config['batch_size'], 
+            ds,
+            batch_size=self.loader_config['batch_size'],
             shuffle=False,
             num_workers=self.loader_config['num_workers'])
         return loader
