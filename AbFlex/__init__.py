@@ -1,1 +1,1 @@
-from .classify import classify
+from .classify import classify  # noqa: F401

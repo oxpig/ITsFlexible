@@ -4,6 +4,7 @@ from openbabel import pybel
 from Bio.SeqUtils import seq1
 from biopandas.pdb import PandasPdb
 
+
 # saves info about specific atom type
 class Info:
     def __init__(
@@ -37,6 +38,7 @@ class Info:
         self.xs_donor = xs_donor
         self.xs_acceptor = xs_acceptor
         self.ad_heteroatom = ad_heteroatom
+
 
 class Typer:
     """Python reimplementation of the gninatyper function,
@@ -510,7 +512,6 @@ class Typer:
         ]
         self.atom_types = [info.sm for info in self.atom_type_data]
 
-    
     def string_to_smina_type(self, string: str):
         """Convert string type to smina type
 
@@ -547,20 +548,22 @@ class Typer:
 
     def adjust_smina_type(self, t, hBonded, heteroBonded):
         if (
-            t == "AliphaticCarbonXSNonHydrophobe" or t == "AliphaticCarbonXSHydrophobe"
+            t == "AliphaticCarbonXSNonHydrophobe" or
+            t == "AliphaticCarbonXSHydrophobe"
         ):  # C_C_C_P,
             if heteroBonded:
                 return "AliphaticCarbonXSNonHydrophobe"
             else:
                 return "AliphaticCarbonXSHydrophobe"
         elif (
-            t == "AromaticCarbonXSNonHydrophobe" or t == "AromaticCarbonXSHydrophobe"
+            t == "AromaticCarbonXSNonHydrophobe" or
+            t == "AromaticCarbonXSHydrophobe"
         ):  # C_A_C_P,
             if heteroBonded:
                 return "AromaticCarbonXSNonHydrophobe"
             else:
                 return "AromaticCarbonXSHydrophobe"
-        elif t == "Nitrogen" or t == "NitogenXSDonor":  # N_N_N_P, no hydrogen bonding
+        elif t == "Nitrogen" or t == "NitogenXSDonor":  # N_N_N_P, no h bonding
             if hBonded:
                 return "NitrogenXSDonor"
             else:
@@ -591,15 +594,17 @@ class Typer:
         # obtain atom names via openbabel
         num = ob_atom.atomicnum
         ename = openbabel.GetSymbol(num)
-        if num == 1: # hydrogen
+        if num == 1:  # hydrogen
             ename = "HD"
-        elif num == 6 and ob_atom.OBAtom.IsAromatic(): # aromatic carbon
+        elif num == 6 and ob_atom.OBAtom.IsAromatic():  # aromatic carbon
             ename = "A"
-        elif num == 8: # oxygen
+        elif num == 8:  # oxygen
             ename = "OA"
-        elif num == 7 and ob_atom.OBAtom.IsHbondAcceptor(): # nitrogen H-bond acceptor
+        elif num == 7 and ob_atom.OBAtom.IsHbondAcceptor():
+            # nitrogen H-bond acceptor
             ename = "NA"
-        elif num == 16 and ob_atom.OBAtom.IsHbondAcceptor(): # sulphur H-bond acceptor
+        elif num == 16 and ob_atom.OBAtom.IsHbondAcceptor():
+            # sulphur H-bond acceptor
             ename = "SA"
         # convert atom name to smina typ
         atype = self.string_to_smina_type(ename)
@@ -658,12 +663,13 @@ class Typer:
 
         Args:
             mol (pybel.Molecule): molecule object to be written to file
-            inf (str): Path to pdb file, only necessary for occupancy value saving
-            return_occupancy_value (bool): If True, save the value in columns 55-58 of the pdb.
+            inf (str): Path to pdb file, only necessary for occupancy value
+                       saving
+            return_occupancy_value (bool): If True, save the value in columns
+                                           55-58 of the pdb.
         """
         types = []
         occupancy_values = []
-        
         pdb_types = []
         res_numbers = []
         res_types = []
@@ -680,9 +686,9 @@ class Typer:
 
             pdb_type = atom.residue.OBResidue.GetAtomID(atom.OBAtom).strip()
             res_number = atom.residue.idx
-            res_type = seq1(atom.residue.name) # convert AA 3 to 1 letter code
+            res_type = seq1(atom.residue.name)  # convert AA 3 to 1 letter code
 
-            # excluding H in the pdb annotation --> this might have to be changed
+            # excluding H in the pdb annotation --> might have to be changed
             if pdb_type != 'H':
                 xs.append(atom.coords[0])
                 ys.append(atom.coords[1])
@@ -702,28 +708,19 @@ class Typer:
         df["pdb_type"] = pdb_types
         df["res_type"] = res_types
         df["res_number"] = res_numbers
-        
+
         if return_occupancy_value:
             pdb_df = PandasPdb().read_pdb(str(inf)).df["ATOM"]
             pdb_df = pdb_df.set_index(["x_coord", "y_coord", "z_coord"])
             for i in range(len(df)):
                 row = df.iloc[i]
-                                
-                #try:
-                #    occupancy = int(pdb_df.loc[row["x"], row["y"], row["z"]]["occupancy"])
-                #except:
-                #    print('occ error with', inf)
-                #    print(pdb_df.loc[row["x"], row["y"], row["z"]]["occupancy"])
-                #    pass
-                
+
                 occupancy = int(
                     pdb_df.loc[row["x"], row["y"], row["z"]]["occupancy"]
                 )
                 occupancy_values.append(occupancy)
-        
+
         return types, occupancy_values
-                
-        
 
     def run(
         self,
@@ -735,7 +732,8 @@ class Typer:
 
         Args:
             inf (str): Path to pdb file
-            return_occupancy_value (bool, optional): Save the value in columns 55-58 of the pdb.
+            return_occupancy_value (bool, optional): Save the value in columns
+                                                     55-58 of the pdb.
                 Defaults to True.
             add_hydrogens (bool, optional): Add hydrogens using OpenBabel.
                 Defaults to True
@@ -747,9 +745,9 @@ class Typer:
         openbabel.obErrorLog.SetOutputLevel(openbabel.obError)
         mol = self.read_file(inf, add_hydrogens)
 
-        if type(mol) == int:
+        if type(mol) is int:
             raise ValueError(f"{inf} returned with error code {mol}")
-        
+
         # run typing on molecule
         types, occupancies = self.get_types(
             mol, inf, return_occupancy_value
