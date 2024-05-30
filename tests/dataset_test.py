@@ -1,7 +1,9 @@
 '''Test LoopGraphDataSet class'''
 import unittest
 import numpy as np
-from AbFlex.base.dataset import LoopGraphDataSet
+import sys
+sys.path.append('../')
+from AbFlex.base.dataset import LoopGraphDataSet  # noqa
 
 
 class TestLoopContext(unittest.TestCase):
