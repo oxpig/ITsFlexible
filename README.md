@@ -7,7 +7,7 @@
 </div>
 
 ---
-![Unit tests](https://github.com/fspoendlin/AbFlex/actions/workflows/<WORKFLOW_FILE>/badge.svg)
+![Unit tests](https://github.com/fspoendlin/AbFlex/actions/workflows/unittest_linting.yml/badge.svg)
 
 AbFlex is a Python package for [describe the purpose of your package here].
 
