@@ -9,7 +9,7 @@
 ---
 ![Unit tests](https://github.com/fspoendlin/AbFlex/actions/workflows/unittest_linting.yml/badge.svg)
 
-AbFlex is a Python package for classifying the conformational flexibility of antibody CDRs and loop motifs in general proteins.
+AbFlex is a Python package for classifying the conformational flexibility of antibody CDRs and loop motifs in general proteins. The codebase is inspired by ![Graphinity](https://github.com/amhummer/Graphinity) and ![egnn](https://github.com/vgsatorras/egnn).
 
 ## Abstract
 
@@ -64,3 +64,5 @@ The input file should be a csv file with the following columns:
 | index | pdb | ab_chains | chain | resi_start | resi_end |
 | ----- | --- | --------- | ----- | ---------- | -------- |
 | 0     | /path/to/structure.pdb | labels of all chains included in context (i.e. heavy & light chain) | chain with loop | first residue of loop | last residue of loop |
+
+
