@@ -14,6 +14,7 @@ class LoopGraphDataSet(Dataset):
 
     def __init__(self,
                  interaction_dist: float = 10,
+                 context_inclusion_dist: float = 10,
                  graph_mode: str = 'loop_context',
                  typing_mode='res_type',
                  edge_encoding=['covalent', 'rbf'],
@@ -27,6 +28,7 @@ class LoopGraphDataSet(Dataset):
         self.protloop_defs = pd.DataFrame()
         self.labels = []
         self.interaction_dist = interaction_dist
+        self.context_inclusion_dist = context_inclusion_dist
         self.typing_mode = typing_mode
         self.graph_mode = graph_mode
         self.cache = {}
@@ -79,7 +81,7 @@ class LoopGraphDataSet(Dataset):
 
         # identifying nodes within distance of cdr
         _, neighbours_context = np.where(
-            dist_loop_context < self.interaction_dist
+            dist_loop_context < self.context_inclusion_dist
         )
         context_node_idx = sorted(np.unique(neighbours_context))
         context_nodes = context_nodes.iloc[context_node_idx, :]

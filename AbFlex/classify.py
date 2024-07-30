@@ -12,7 +12,6 @@ from AbFlex.base.dataset import LoopGraphDataSet
 def classify(infile=None,
              outfile=None,
              predictor='loop',
-             config='trained_model/config.yaml',
              weights=None):
     '''Classify antibody CDR and protein loop flexibility.
 
@@ -25,6 +24,7 @@ def classify(infile=None,
     '''
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
+    config = f'trained_model/config_{predictor}.yaml',
     config_path = os.path.join(script_dir, config)
     with open(config_path) as f:
         config = yaml.safe_load(f)

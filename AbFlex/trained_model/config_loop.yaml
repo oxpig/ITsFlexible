@@ -4,7 +4,7 @@ restore: False
 test: True
 
 logger_params:
-  entity: f-spoendlin
+  entity: username
   group:  test
   log_interval: 10
   print_interval: 50
@@ -47,13 +47,14 @@ dataset_params:
   cache_frames: False
   graph_generation_mode: loop_context
   interaction_dist: 10
+  context_inclusion_dist: 10
   typing_mode: res_type
   edge_encoding: ['covalent', 'rbf']
   aa_map_mode: 'extended'
   input_files:
     train:
-      - /vols/opig/users/spoendli/data/pdb_loop_datasets/train_no_overlap_realdssp_EGNN_5_strucs_per_seq.csv
+      - ../data/train_align_loop.csv
     val:
-      - /vols/opig/users/spoendli/data/pdb_loop_datasets/val_no_overlap_realdssp_EGNN.csv
+      - ../data/val_align_loop.csv
     test:
-      - /vols/opig/users/spoendli/data/pdb_loop_datasets/test_EGNN.csv
+      - ../data/test_align_loop.csv

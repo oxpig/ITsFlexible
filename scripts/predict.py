@@ -9,7 +9,7 @@ from AbFlex.base.dataset import LoopGraphDataSet
 
 
 def main():
-    config_path = '../AbFlex/trained_model/config.yaml'
+    config_path = '../AbFlex/trained_model/config_loop.yaml'
     dataset_path = '../data/CDRH3_test_align_loop.csv'
     checkpoint_path = '../AbFlex/trained_model/align_loop_top.ckpt'
 
