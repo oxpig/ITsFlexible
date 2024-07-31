@@ -30,7 +30,7 @@ jobs:
     - name: Install dependenciess
       run: |
         conda install pip
-        pip install torch --index-url https://download.pytorch.org/whl/cpu
+        pip install torch==2.3.0 --index-url https://download.pytorch.org/whl/cpu
         pip install .
         pip install torch_geometric
         pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.3.0+cpu.html

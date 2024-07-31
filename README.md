@@ -2,12 +2,16 @@
 
 <div align="center">    
  
-# AbFlex: Predicting the conformational flexibility of antibody CDRs 
+# AbFlex: Predicting the conformational flexibility of antibody CDRs
+
+<a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
+<a href="https://pytorchlightning.ai/"><img alt="Lightning" src="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white"></a>
+[![OpenReview](http://img.shields.io/badge/OpenReview-8C1C12.svg)](https://openreview.net/forum?id=or4tArwd5a)
+[![Conference](http://img.shields.io/badge/ICLR-2024-4b44ce.svg)](https://icml.cc/Conferences/2024)
+[![Unit tests](https://github.com/fspoendlin/AbFlex/actions/workflows/unittest_linting.yml/badge.svg)]
 
 </div>
 
----
-![Unit tests](https://github.com/fspoendlin/AbFlex/actions/workflows/unittest_linting.yml/badge.svg)
 
 AbFlex is a Python package for classifying the conformational flexibility of antibody CDRs and loop motifs in general proteins. The codebase is inspired by ![Graphinity](https://github.com/amhummer/Graphinity) and ![egnn](https://github.com/vgsatorras/egnn).
 
@@ -27,7 +31,7 @@ conda activate AbFlex_env
 Install pytorch 2.3 with the appropriate version for your system, (see [pytorch.org](https://pytorch.org/get-started/locally/)). For cpu only, use:
 
 ```bash
-pip install torch --index-url https://download.pytorch.org/whl/cpu
+pip install torch==2.3.0 --index-url https://download.pytorch.org/whl/cpu
 ```
 
 Clone the repository and install the package:
