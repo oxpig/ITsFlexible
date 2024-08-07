@@ -24,7 +24,7 @@ Proteins are highly flexible macromolecules and the ability to adapt their shape
 Create a conda environment:
 
 ```bash
-conda env create -n AbFlex_env python=3.10
+conda create -n AbFlex_env python=3.10
 conda activate AbFlex_env
 ```
 
