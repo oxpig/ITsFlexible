@@ -8,7 +8,7 @@
 <a href="https://pytorchlightning.ai/"><img alt="Lightning" src="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white"></a>
 [![OpenReview](http://img.shields.io/badge/OpenReview-8C1C12.svg)](https://openreview.net/forum?id=or4tArwd5a)
 [![Conference](http://img.shields.io/badge/ICLR-2024-4b44ce.svg)](https://icml.cc/Conferences/2024)
-[![Unit tests](https://github.com/fspoendlin/AbFlex/actions/workflows/unittest_linting.yml/badge.svg)]
+![Unit tests](https://github.com/fspoendlin/AbFlex/actions/workflows/unittest_linting.yml/badge.svg)
 
 </div>
 
