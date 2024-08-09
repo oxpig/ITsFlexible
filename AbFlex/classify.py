@@ -24,7 +24,7 @@ def classify(infile=None,
     '''
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
-    config = f'trained_model/config_{predictor}.yaml',
+    config = f'trained_model/config_{predictor}.yaml'
     config_path = os.path.join(script_dir, config)
     with open(config_path) as f:
         config = yaml.safe_load(f)
@@ -50,6 +50,7 @@ def classify(infile=None,
                 **config['model_params'])
 
     ds = LoopGraphDataSet(
+            predict=True,
             **config['dataset_params']
             )
     ds.populate(input_file=infile)

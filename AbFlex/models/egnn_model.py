@@ -79,7 +79,7 @@ class flexEGNN(pl.LightningModule):
         else:
             raise NotImplementedError('Pooling function not implemented')
 
-        if dataset_config['graph_generation_mode'] == 'loop_context':
+        if dataset_config['graph_mode'] == 'loop_context':
             num_node_features = 22
         else:
             num_node_features = 21
@@ -385,7 +385,7 @@ class flexEGNN(pl.LightningModule):
 
         ds = LoopGraphDataSet(
             interaction_dist=self.dataset_config['interaction_dist'],
-            graph_mode=self.dataset_config['graph_generation_mode'],
+            graph_mode=self.dataset_config['graph_mode'],
             typing_mode=self.dataset_config['typing_mode'],
             edge_encoding=self.dataset_config['edge_encoding'],
             aa_map_mode=self.dataset_config['aa_map_mode'],
@@ -407,7 +407,7 @@ class flexEGNN(pl.LightningModule):
 
         ds = LoopGraphDataSet(
             interaction_dist=self.dataset_config['interaction_dist'],
-            graph_mode=self.dataset_config['graph_generation_mode'],
+            graph_mode=self.dataset_config['graph_mode'],
             typing_mode=self.dataset_config['typing_mode'],
             edge_encoding=self.dataset_config['edge_encoding'],
             aa_map_mode=self.dataset_config['aa_map_mode'],
@@ -438,7 +438,7 @@ class flexEGNN(pl.LightningModule):
 
         ds = LoopGraphDataSet(
             interaction_dist=self.dataset_config['interaction_dist'],
-            graph_mode=self.dataset_config['graph_generation_mode'],
+            graph_mode=self.dataset_config['graph_mode'],
             typing_mode=self.dataset_config['typing_mode'],
             edge_encoding=self.dataset_config['edge_encoding'],
             aa_map_mode=self.dataset_config['aa_map_mode'],

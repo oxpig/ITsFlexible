@@ -21,6 +21,7 @@ class LoopGraphDataSet(Dataset):
                  aa_map_mode='extended',
                  cache_frames: bool = False,
                  predict=False,
+                 **kwargs,
                  ):
 
         self.predict = predict
@@ -358,7 +359,7 @@ class LoopGraphDataSet(Dataset):
         return graph_dict
 
     def _parse_graph(self, graph_dict: dict, label: np.ndarray,
-                     protloop_def: dict, predict=False):
+                     protloop_def: dict):
         """Generate parsed graph object in correct format. This is intended to
         be overwritten by child classes depending on requirements of the
         downstream models. Base implementation parses the data into a pytorch
@@ -375,7 +376,7 @@ class LoopGraphDataSet(Dataset):
                 edge_attr=th.from_numpy(graph_dict['edge_attr'])
             )
 
-        if predict:
+        if self.predict:
             graph = Data(
                 x=th.from_numpy(graph_dict['nodes'][:, 3:]),
                 edge_index=edge_index,
@@ -410,7 +411,11 @@ class LoopGraphDataSet(Dataset):
         """
 
         protloop_defs = pd.read_csv(input_file)
-        labels = protloop_defs["labels"].to_list()
+        if self.predict:
+            # empty list of labels at inference
+            labels = [None for _ in range(len(protloop_defs))]
+        else:
+            labels = protloop_defs["labels"].to_list()
 
         # either overwrite or add to self.protloop_defs and self.labels
         if overwrite:
@@ -475,7 +480,7 @@ class LoopGraphDataSet(Dataset):
             loop_resi=[protloop_def['resi_start'], protloop_def['resi_end']]
         )
         graph = self._parse_graph(
-            graph_dict, label, protloop_def=protloop_def, predict=self.predict
+            graph_dict, label, protloop_def=protloop_def
         )
 
         return graph

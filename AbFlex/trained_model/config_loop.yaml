@@ -43,9 +43,8 @@ loader_params:
   balanced_sampling: False
 
 dataset_params:
-  rotate: False
   cache_frames: False
-  graph_generation_mode: loop_context
+  graph_mode: loop_context
   interaction_dist: 10
   context_inclusion_dist: 10
   typing_mode: res_type
