@@ -81,8 +81,8 @@ def main(config: dict):
 
 
 if __name__ == "__main__":
-    with open('../AbFlex/trained_model/config_loop.yaml') as yaml_file_handle:
-        config = yaml.safe_load(yaml_file_handle)
+    with open('../ITsFlexible/trained_model/config_loop.yaml') as file_handle:
+        config = yaml.safe_load(file_handle)
     config = defaultdict(lambda: None, config)
 
     config['save_dir'] = (config['save_dir'] + '/' +

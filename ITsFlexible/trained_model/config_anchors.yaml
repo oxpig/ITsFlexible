@@ -52,8 +52,8 @@ dataset_params:
   aa_map_mode: 'extended'
   input_files:
     train:
-      - ../data/train_align_anchors.csv
+      - ../data/correct_paths/train_align_anchors.csv
     val:
-      - ../data/val_align_anchors.csv
+      - ../data/correct_paths/val_align_anchors.csv
     test:
-      - ../data/test_align_anchors.csv
+      - ../data/correct_paths/test_align_anchors.csv

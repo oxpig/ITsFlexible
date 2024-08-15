@@ -9,9 +9,9 @@ from ITsFlexible.base.dataset import LoopGraphDataSet
 
 
 def main():
-    config_path = '../AbFlex/trained_model/config_loop.yaml'
-    dataset_path = '../data/CDRH3_test_align_loop.csv'
-    checkpoint_path = '../AbFlex/trained_model/align_loop_top.ckpt'
+    config_path = '../ITsFlexible/trained_model/config_loop.yaml'
+    dataset_path = '../data/correct_paths/CDRH3_test_align_loop.csv'
+    checkpoint_path = '../ITsFlexible/trained_model/align_loop_top.ckpt'
 
     with open(config_path) as f:
         config = yaml.safe_load(f)
