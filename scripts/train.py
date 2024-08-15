@@ -6,7 +6,7 @@ from collections import defaultdict
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
-from AbFlex.models.egnn_model import flexEGNN
+from ITsFlexible.models.egnn_model import flexEGNN
 
 
 def main(config: dict):

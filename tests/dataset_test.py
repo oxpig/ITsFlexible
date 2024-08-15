@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 import sys
 sys.path.append('../')
-from AbFlex.base.dataset import LoopGraphDataSet  # noqa
+from ITsFlexible.base.dataset import LoopGraphDataSet  # noqa
 
 
 class TestLoopContext(unittest.TestCase):

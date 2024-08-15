@@ -4,8 +4,8 @@ import yaml
 from collections import defaultdict
 import pytorch_lightning as pl
 from torch_geometric.loader import DataLoader as GeoDataLoader
-from AbFlex.models.egnn_model import flexEGNN
-from AbFlex.base.dataset import LoopGraphDataSet
+from ITsFlexible.models.egnn_model import flexEGNN
+from ITsFlexible.base.dataset import LoopGraphDataSet
 
 
 def main():
