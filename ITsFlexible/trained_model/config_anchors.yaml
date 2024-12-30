@@ -1,14 +1,15 @@
-save_dir: scratch/
-name: '0'
+save_dir: ../data/training/
+name: 'initial'
+log: False
 restore: False
 test: True
 
 logger_params: # logging with wandb
   entity: username
-  group:  test
+  group:  group_name
   log_interval: 10
   print_interval: 50
-  project: test
+  project: project_name
 
 model: flexEGNN
 model_params:
@@ -35,7 +36,7 @@ trainer_params:
   max_epochs: 200
   accelerator: 'auto'
   num_nodes: 1
-  gradient_clip_val: 10 # comment out whole line to remove grad clipping
+  gradient_clip_val: 10
 
 loader_params:
   batch_size: 32
@@ -52,8 +53,8 @@ dataset_params:
   aa_map_mode: 'extended'
   input_files:
     train:
-      - ../data/correct_paths/train_align_anchors.csv
+      - ../data/train_align_anchors.csv
     val:
-      - ../data/correct_paths/val_align_anchors.csv
+      - ../data/val_align_anchors.csv
     test:
-      - ../data/correct_paths/test_align_anchors.csv
+      - ../data/test_align_anchors.csv
