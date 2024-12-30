@@ -1,3 +1,6 @@
+'''Script to predict CDR3 flexibility using the ITsFlexible models'''
+
+import argparse
 import pandas as pd
 import numpy as np
 import yaml
@@ -8,10 +11,9 @@ from ITsFlexible.models.egnn_model import flexEGNN
 from ITsFlexible.base.dataset import LoopGraphDataSet
 
 
-def main():
-    config_path = '../ITsFlexible/trained_model/config_loop.yaml'
-    dataset_path = '../data/correct_paths/CDRH3_test_align_loop.csv'
-    checkpoint_path = '../ITsFlexible/trained_model/align_loop_top.ckpt'
+def main(dataset_path, predictor):
+    config_path = f'../ITsFlexible/trained_model/config_{predictor}.yaml'
+    checkpoint_path = f'../ITsFlexible/trained_model/align_{predictor}_top.ckpt'
 
     with open(config_path) as f:
         config = yaml.safe_load(f)
@@ -41,5 +43,10 @@ def main():
     df.to_csv('predictions.csv')
 
 
+parser = argparse.ArgumentParser(description='Predict CDR3 flexibility')
+parser.add_argument('--dataset', type=str, help='Path to dataset', default='../data/CDRH3_test_align_loop.csv')
+parser.add_argument('--predictor', type=str, help='Predictor type', default='loop')
+
 if __name__ == "__main__":
-    main()
+    args = parser.parse_args()
+    main(args.dataset, args.predictor)

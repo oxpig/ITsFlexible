@@ -1,3 +1,4 @@
+import argparse
 import torch
 from pathlib import Path
 import yaml
@@ -10,14 +11,17 @@ from ITsFlexible.models.egnn_model import flexEGNN
 
 
 def main(config: dict):
-    logger = WandbLogger(
-        save_dir=Path(config['save_dir']),
-        name=f"{config['name']}",
-        project=f"{config['logger_params']['project']}",
-        group=config['logger_params']['group'],
-        config={**config['model_params'], **config['trainer_params'],
-                **config['loader_params'], **config['dataset_params']},
-        )
+    if config['log']:
+        logger = WandbLogger(
+            save_dir=Path(config['save_dir']),
+            name=f"{config['name']}",
+            project=f"{config['logger_params']['project']}",
+            group=config['logger_params']['group'],
+            config={**config['model_params'], **config['trainer_params'],
+                    **config['loader_params'], **config['dataset_params']},
+            )
+    else:
+        logger = None
 
     model = flexEGNN(
             dataset_config=config['dataset_params'],
@@ -79,12 +83,16 @@ def main(config: dict):
             config['save_dir']) / "test_preds.csv"
             )
 
+parser = argparse.ArgumentParser(description='Train CDR3 flexibility model')
+parser.add_argument('--predictor', type=str, help='Predictor type', default='loop')
 
 if __name__ == "__main__":
-    with open('../ITsFlexible/trained_model/config_loop.yaml') as file_handle:
+    args = parser.parse_args()
+
+    print(f"Training {args.predictor} model")
+    with open(f'../ITsFlexible/trained_model/config_{args.predictor}.yaml') as file_handle:
         config = yaml.safe_load(file_handle)
     config = defaultdict(lambda: None, config)
-
     config['save_dir'] = (config['save_dir'] + '/' +
                           config['name'] + '/')
 
