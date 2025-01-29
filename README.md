@@ -84,17 +84,23 @@ classify(infile='path/to/input.csv', outfile='path/to/output.csv', predictor='lo
 
 ITsFlexible provides two predictors for CDR flexiblity: `loop` and `anchors`. These differ in the way in which structural similarity is defined. For `loop` similarity is calculated by alignment on the loop residues themselves, while `anchors` similarity is calculated by alignment on the Fv residues (flanking the loop). For the `loop` predictor we recommend setting `resi_start` to IMGT residue 107 and `resi_end` to 116. For the `anchors` predictor we recommend setting `resi_start` to 105 and `resi_end` to 118. If input structures are not IMGT numbered the suggested numbers should be changed to point to the residues corresponding to the specified IMGT residues.
 
-ITsFlexible outputs a csv file with an additional column containing the predicted classification score. Classification scores should be interpreted as follows for the `loop` predictor:
+ITsFlexible outputs a csv file with an additional column containing the predicted classification score. We recommend interpretation of classification scores for the `loop` predictor as follows. These values are chosen based on the false positive rate (FPR) and false negative rate (FNR) observed for classification across test sets for all CDR3s.
 
-| high confidence rigid | low confidence rigid | ambiguous |low confidence flexible | high confidence flexible |
+| high confidence rigid (FNR <= 0.1)| low confidence rigid (FNR 0.1 - 0.2)| ambiguous |low confidence flexible (FPR 0.1 - 0.2) high confidence flexible (FPR <= 0.1) |
 | ---------------------- | --------------------- | ------------------------ | ------------------------ | ------------------------ |
-| 0 - 0.025              | 0.025 - 0.075         | 0.075 - 0.25             | 0.25 - 0.30              | 0.25 - 1                 |
+| 0 - 0.02               | 0.02 - 0.03           | 0.03 - 0.06              | 0.06 - 0.12              | 0.12 - 1                 |
 
-and for the `anchors` predictor:
 
-| high confidence rigid | low confidence rigid | ambiguous |low confidence flexible | high confidence flexible |
+For the `anchors` predictor we recommend the following scores:
+
+| high confidence rigid (FNR <= 0.1)| low confidence rigid (FNR 0.1 - 0.2)| ambiguous |low confidence flexible (FPR 0.1 - 0.2) high confidence flexible (FPR <= 0.1) |
 | ---------------------- | --------------------- | ------------------------ | ------------------------ | ------------------------ |
-| 0 - 0.20               | 0.20 - 0.40           | 0.40 - 0.60              | 0.60 - 0.85              | 0.85 - 1                 |
+| 0 - 0.34               | 0.34 - 0.50           | 0.50 - 0.69              | 0.69 - 0.80              | 0.80 - 1                 |
+
+
+To tune classification scores to each individual class of CDR3s see the figure below:
+
+![Confidence Image](./figs/prediction_score_confidence.pdf "Confidence Image")
 
 
 **Training**
