@@ -86,21 +86,23 @@ ITsFlexible provides two predictors for CDR flexiblity: `loop` and `anchors`. Th
 
 ITsFlexible outputs a csv file with an additional column containing the predicted classification score. We recommend interpretation of classification scores for the `loop` predictor as follows. These values are chosen based on the false positive rate (FPR) and false negative rate (FNR) observed for classification across test sets for all CDR3s.
 
-| high confidence rigid (FNR <= 0.1)| low confidence rigid (FNR 0.1 - 0.2)| ambiguous |low confidence flexible (FPR 0.1 - 0.2) high confidence flexible (FPR <= 0.1) |
+| high confidence rigid (FNR <= 0.1)| low confidence rigid (FNR 0.1 - 0.2)| ambiguous | low confidence flexible (FPR 0.1 - 0.2) | high confidence flexible (FPR <= 0.1) |
 | ---------------------- | --------------------- | ------------------------ | ------------------------ | ------------------------ |
 | 0 - 0.02               | 0.02 - 0.03           | 0.03 - 0.06              | 0.06 - 0.12              | 0.12 - 1                 |
 
 
 For the `anchors` predictor we recommend the following scores:
 
-| high confidence rigid (FNR <= 0.1)| low confidence rigid (FNR 0.1 - 0.2)| ambiguous |low confidence flexible (FPR 0.1 - 0.2) high confidence flexible (FPR <= 0.1) |
+| high confidence rigid (FNR <= 0.1)| low confidence rigid (FNR 0.1 - 0.2)| ambiguous | low confidence flexible (FPR 0.1 - 0.2) | high confidence flexible (FPR <= 0.1) |
 | ---------------------- | --------------------- | ------------------------ | ------------------------ | ------------------------ |
 | 0 - 0.34               | 0.34 - 0.50           | 0.50 - 0.69              | 0.69 - 0.80              | 0.80 - 1                 |
 
 
 To tune classification scores to each individual class of CDR3s see the figure below:
 
-![Confidence Image](./figs/prediction_score_confidence.pdf "Confidence Image")
+<p align="center">
+<img src="figs/prediction_score_confidence.pdf" alt="FPRs and FNRs as a function of threshold" width="90%">
+</p>
 
 
 **Training**
