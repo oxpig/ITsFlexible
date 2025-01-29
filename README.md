@@ -101,7 +101,7 @@ For the `anchors` predictor we recommend the following scores:
 To tune classification scores to each individual class of CDR3s see the figure below:
 
 <p align="center">
-<img src="figs/prediction_score_confidence.png" alt="FPRs and FNRs as a function of threshold" width="90%">
+<img src="figs/prediction_score_confidence.png" alt="FPRs and FNRs as a function of threshold" width="100%">
 </p>
 
 
