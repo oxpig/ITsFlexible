@@ -8,6 +8,7 @@
 <a href="https://pytorchlightning.ai/"><img alt="Lightning" src="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white"></a>
 [![OpenReview](http://img.shields.io/badge/OpenReview-8C1C12.svg)](https://openreview.net/forum?id=or4tArwd5a)
 ![Unit tests](https://github.com/fspoendlin/ITsFlexible/actions/workflows/unittest_linting.yml/badge.svg)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15032263.svg)](https://doi.org/10.5281/zenodo.15032263)
 
 </div>
 
@@ -16,7 +17,7 @@ ITsFlexible is a Python package for classifying the conformational flexibility o
 
 ## Abstract
 
-Many proteins are highly flexible macromolecules and their ability to adapt their shape can be fundamental to their functional properties. We can now computationally predict a single, static protein structure with high accuracy. However, we are not yet able to reliably predict structural flexibility. A major factor limiting such predictions is the scarcity of suitable training data. Here, we focus on predicting the structural flexibility of the functionally important antibody and T-cell receptor CDR3s. Structurally, CDR3s are loops between two antiparallel $\beta$-strands. To create a dataset that could potentially predict their flexibility, we extracted all such loop motifs from the PDB to create ALL-conformations, a dataset containing 1.2 million structures and more than 100,000 unique sequences. Using this dataset, we develop ITsFlexible a method that classifies CDR3 flexibility. The model outperforms all alternative approaches on our datasets of CDR flexibility observed in crystal structures and successfully generalises to MD simulation data. We used ITsFlexible to predict the flexibility of three completely novel CDRH3 loops and experimentally determined their conformations using cryo-EM. The experiments showed that predictions were correct for two of the three case studies.
+Many proteins are highly flexible and their ability to adapt their shape can be fundamental to their functional properties. We can now computationally predict a single, static protein structure with high accuracy. However, we are not yet able to reliably predict structural flexibility. A major factor limiting such predictions is the scarcity of suitable training data. Here, we focus on predicting the structural flexibility of the functionally important antibody and T-cell receptor CDR3 loops. We extracted a dataset of CDR3 like loop motifs from the PDB to create ALL-conformations, a dataset containing 1.2 million structures and more than 100,000 unique sequences. Using this dataset, we develop ITsFlexible a method classifying CDR3 flexibility, which outperforms all alternative approaches on our crystal structure datasets and successfully generalises to MD simulations. We also used ITsFlexible to predict the flexibility of three completely novel CDRH3 loops and experimentally determined their conformations using cryo-EM.
 
 ## Installation
 
@@ -118,6 +119,13 @@ python train.py --predictor loop
 ## Citation
 
 ```
+@article{Spoendlin2024,
+	title = {Predicting the Conformational Flexibility of Antibody and T-Cell Receptor CDRs},
+	author = { Fabian C. Spoendlin, Monica L. Fernandez-Quintero, Sai S. R. Raghavan, Hannah L. Turner, Anant Gharpure, Johannes R. Loeffler, Wing K. Wong, Guy Georges, Alexander Bujotzek, Andrew B. Ward, and Charlotte M. Deane},
+	url = {https://doi.org/10.1101/2025.03.19.644119},
+	year = {2025},
+}
+
 @article{Spoendlin2024,
 	title = {AbFlex: Predicting the conformational flexibility of antibody CDRs},
 	author = {Fabian C. Spoendlin, Wing Ki Wong, Guy Georges, Alexander Bujotzek, and Charlotte M. Deane},
