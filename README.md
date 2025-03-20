@@ -119,7 +119,7 @@ python train.py --predictor loop
 ## Citation
 
 ```
-@article{Spoendlin2024,
+@article{Spoendlin2025,
 	title = {Predicting the Conformational Flexibility of Antibody and T-Cell Receptor CDRs},
 	author = { Fabian C. Spoendlin, Monica L. Fernandez-Quintero, Sai S. R. Raghavan, Hannah L. Turner, Anant Gharpure, Johannes R. Loeffler, Wing K. Wong, Guy Georges, Alexander Bujotzek, Andrew B. Ward, and Charlotte M. Deane},
 	url = {https://doi.org/10.1101/2025.03.19.644119},
