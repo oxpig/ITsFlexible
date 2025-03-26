@@ -17,6 +17,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Extract the tar.gz file
+tar -xzvf "$FILE_NAME"
 
 # Check if extraction was successful
 if [ $? -ne 0 ]; then

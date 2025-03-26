@@ -9,7 +9,11 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/fspoendlin/ITsFlexible',
-    packages=find_packages('ITsFlexible', 'ITsFlexible.*'),
+    packages=find_packages(include=['ITsFlexible', 'ITsFlexible.*']),
+    include_package_data=True,
+    package_data={
+        'ITsFlexible': ['trained_model/**'],
+    },
     install_requires=[
         'biopandas==0.4.1',
         'biopython==1.83',
