@@ -66,7 +66,7 @@ conda install -c conda-forge openbabel
 
 **Inference on example dataset**
 
-To check if the installation was successful, run inference on an example dataset as below. Inference for the example takes a few second on a standard CPU. GPU use on macOS is not supported use `--accelorator cpu` to run on CPU instead.
+To check if the installation was successful, run inference on an example dataset as below. Inference for the example takes a few second on a standard CPU. GPU use on macOS is not supported use `--accelerator cpu` to run on CPU instead.
 
 ```bash
 cd scripts
@@ -88,7 +88,7 @@ The CDRs can be classified using the provided script:
 
 ```bash
 cd scripts
-python predict.py --dataset path/to/dataset.csv --predictor loop --accelorator auto
+python predict.py --dataset path/to/dataset.csv --predictor loop --accelerator auto
 ```
 
 or by using the following python code:
@@ -96,10 +96,10 @@ or by using the following python code:
 ```python
 from ITsFlexible import classify
 
-classify(infile='path/to/input.csv', outfile='path/to/output.csv', predictor='loop', accelorator='auto')
+classify(infile='path/to/input.csv', outfile='path/to/output.csv', predictor='loop', accelerator='auto')
 ```
 
-GPU use on macOS is not supported use `--accelorator cpu` to run on CPU instead.
+GPU use on macOS is not supported use `--accelerator cpu` to run on CPU instead.
 
 ITsFlexible provides two predictors for CDR flexiblity: `loop` and `anchors`. These differ in the way in which structural similarity is defined. For `loop` similarity is calculated by alignment on the loop residues themselves, while `anchors` similarity is calculated by alignment on the Fv residues (flanking the loop). For the `loop` predictor we recommend setting `resi_start` to IMGT residue 107 and `resi_end` to 116. For the `anchors` predictor we recommend setting `resi_start` to 105 and `resi_end` to 118. If input structures are not IMGT numbered the suggested numbers should be changed to point to the residues corresponding to the specified IMGT residues.
 
