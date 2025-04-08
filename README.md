@@ -22,7 +22,7 @@ Many proteins are highly flexible and their ability to adapt their shape can be 
 
 ## Installation
 
-Create a conda environment:
+Complete installation takes < 1 min. Start by createing a conda environment:
 
 ```bash
 conda create -n ITsFlexible_env python=3.10
@@ -56,11 +56,27 @@ Install conda dependencies:
 conda install -c conda-forge openbabel
 ```
 
+**System requirements:**
+
+- Dependencies: python 3.10, biopandas 0.4.1, biopython 1.83, fastparquet 2024.2.0, numpy 1.26.4, pandas 2.2.1, pyarrow 14.0.2, lightning 2.2.5, scikit-learn 1.5.0, tqdm 4.66.4, wandb 0.17.0, torch 2.3.0, torch-geometric, pyg-lib, torch-scatter, torch-sparse torch-cluster, torch-spline-conv, openbabel
+- OS: any OS compatible with the above dependencies, tested on Linux Ubuntu 22.10, Linux Fedora 40 and MacOS 15
+- GPU: No GPU required for inference
+
 ## Usage
 
-**Inference**
+**Inference on example dataset**
 
-To classify CDRs with ITsFlexible you will need to provide a csv file and have crystal or predicted structures of your antibodies/TCRs in pdb format.
+To check if the installation was successful, run inference on an example dataset as below. Inference for the example takes a few second on a standard CPU.
+
+```bash
+cd scripts
+bash downloads/CDR_test_download.sh
+python predict.py --dataset ../data/CDRH3_test_align_loop.csv --predictor loop
+```
+
+**Inference on own dataset**
+
+To run ITsFlexible on your own dataset you will need to provide a csv file and have crystal or predicted structures of your antibodies/TCRs in pdb format.
 
 The input csv file with the following columns:
 
