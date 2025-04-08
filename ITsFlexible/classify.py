@@ -12,7 +12,8 @@ from ITsFlexible.base.dataset import LoopGraphDataSet
 def classify(infile=None,
              outfile=None,
              predictor='loop',
-             weights=None):
+             weights=None,
+             accelerator='auto'):
     '''Classify antibody CDR and protein loop flexibility.
 
     Args:
@@ -21,6 +22,7 @@ def classify(infile=None,
         predictor (str): Type of predictor to use (loop or anchors).
         config (str): Path to configuration file.
         weights (str): Path to model weights.
+        accelerator (str): Accelerator to use, default "auto".
     '''
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -56,7 +58,10 @@ def classify(infile=None,
     ds.populate(input_file=infile)
     loader = GeoDataLoader(ds, batch_size=32, num_workers=4, shuffle=False)
 
-    trainer = pl.Trainer(logger=False)
+    trainer = pl.Trainer(
+        logger=False,
+        accelerator=accelerator
+    )
     preds = trainer.predict(
         model=model, dataloaders=loader, return_predictions=True
         )

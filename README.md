@@ -59,14 +59,14 @@ conda install -c conda-forge openbabel
 **System requirements:**
 
 - Dependencies: python 3.10, biopandas 0.4.1, biopython 1.83, fastparquet 2024.2.0, numpy 1.26.4, pandas 2.2.1, pyarrow 14.0.2, lightning 2.2.5, scikit-learn 1.5.0, tqdm 4.66.4, wandb 0.17.0, torch 2.3.0, torch-geometric, pyg-lib, torch-scatter, torch-sparse torch-cluster, torch-spline-conv, openbabel
-- OS: any OS compatible with the above dependencies, tested on Linux Ubuntu 22.10, Linux Fedora 40 and MacOS 15
-- GPU: No GPU required for inference
+- OS: any OS compatible with the above dependencies, tested on Linux Ubuntu 22.10, Linux Fedora 40 and macOS 15 (CPU only)
+- GPU: CUDA support required when using GPU, CPU only is supported for macOS (sufficient for inference)
 
 ## Usage
 
 **Inference on example dataset**
 
-To check if the installation was successful, run inference on an example dataset as below. Inference for the example takes a few second on a standard CPU.
+To check if the installation was successful, run inference on an example dataset as below. Inference for the example takes a few second on a standard CPU. GPU use on macOS is not supported use `--accelorator cpu` to run on CPU instead.
 
 ```bash
 cd scripts
@@ -88,7 +88,7 @@ The CDRs can be classified using the provided script:
 
 ```bash
 cd scripts
-python predict.py --dataset path/to/dataset.csv --predictor loop
+python predict.py --dataset path/to/dataset.csv --predictor loop --accelorator auto
 ```
 
 or by using the following python code:
@@ -96,8 +96,10 @@ or by using the following python code:
 ```python
 from ITsFlexible import classify
 
-classify(infile='path/to/input.csv', outfile='path/to/output.csv', predictor='loop')
+classify(infile='path/to/input.csv', outfile='path/to/output.csv', predictor='loop', accelorator='auto')
 ```
+
+GPU use on macOS is not supported use `--accelorator cpu` to run on CPU instead.
 
 ITsFlexible provides two predictors for CDR flexiblity: `loop` and `anchors`. These differ in the way in which structural similarity is defined. For `loop` similarity is calculated by alignment on the loop residues themselves, while `anchors` similarity is calculated by alignment on the Fv residues (flanking the loop). For the `loop` predictor we recommend setting `resi_start` to IMGT residue 107 and `resi_end` to 116. For the `anchors` predictor we recommend setting `resi_start` to 105 and `resi_end` to 118. If input structures are not IMGT numbered the suggested numbers should be changed to point to the residues corresponding to the specified IMGT residues.
 

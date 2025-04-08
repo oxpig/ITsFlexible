@@ -9,7 +9,8 @@ mkdir -p "$download_dir"
 cd $download_dir
 
 # Download the file using wget
-wget -O "$FILE_NAME" "$URL"
+# wget -O "$FILE_NAME" "$URL"
+curl -L -o "$FILE_NAME" "$URL"
 
 # Check if download was successful
 if [ $? -ne 0 ]; then

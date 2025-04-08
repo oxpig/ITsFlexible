@@ -10,7 +10,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from ITsFlexible.models.egnn_model import flexEGNN
 
 
-def main(config: dict):
+def main(config: dict, accelerator: str):
     if config['log']:
         logger = WandbLogger(
             save_dir=Path(config['save_dir']),
@@ -47,7 +47,8 @@ def main(config: dict):
         default_root_dir=config['save_dir'],
         logger=logger,
         callbacks=[checkpoint_callback, early_stop_callback],
-        **config['trainer_params'])
+        **config['trainer_params'],
+        accelerator=accelerator)
 
     # load model from checkpoint
     if config['restore']:
@@ -85,11 +86,12 @@ def main(config: dict):
 
 parser = argparse.ArgumentParser(description='Train CDR3 flexibility model')
 parser.add_argument('--predictor', type=str, help='Predictor type', default='loop')
+parser.add_argument('--accelerator', type=str, help='Accelerator type', default='auto')
 
 if __name__ == "__main__":
     args = parser.parse_args()
 
-    print(f"Training {args.predictor} model")
+    print(f"Training {args.predictor} model with {args.accelerator} accelerator")
     with open(f'../ITsFlexible/trained_model/config_{args.predictor}.yaml') as file_handle:
         config = yaml.safe_load(file_handle)
     config = defaultdict(lambda: None, config)
@@ -98,4 +100,4 @@ if __name__ == "__main__":
 
     Path(config['save_dir']).mkdir(exist_ok=True, parents=True)
 
-    main(config)
+    main(config, args.accelerator)
