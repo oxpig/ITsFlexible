@@ -29,10 +29,10 @@ conda create -n ITsFlexible_env python=3.10
 conda activate ITsFlexible_env
 ```
 
-Install pytorch 2.3 with the appropriate version for your system, (see [pytorch.org](https://pytorch.org/get-started/locally/)). For cpu only, use:
+Install pytorch 2.7.* with the appropriate version for your system, (see [pytorch.org](https://pytorch.org/get-started/locally/)). For cpu only, use:
 
 ```bash
-pip install torch==2.3.0 --index-url https://download.pytorch.org/whl/cpu
+pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cpu
 ```
 
 Clone the repository and install the package:
@@ -47,7 +47,7 @@ Install torch geometric for the correct version of your system (see [pytorch-geo
 
 ```bash
 pip install torch_geometric
-pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
+pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.7.0+cpu.html
 ```
 
 Install conda dependencies:
@@ -58,7 +58,7 @@ conda install -c conda-forge openbabel
 
 **System requirements:**
 
-- Dependencies: python 3.10, biopandas 0.4.1, biopython 1.83, fastparquet 2024.2.0, numpy 1.26.4, pandas 2.2.1, pyarrow 14.0.2, lightning 2.2.5, scikit-learn 1.5.0, tqdm 4.66.4, wandb 0.17.0, torch 2.3.0, torch-geometric, pyg-lib, torch-scatter, torch-sparse torch-cluster, torch-spline-conv, openbabel
+- Dependencies: python 3.10, biopandas 0.4.1, biopython 1.83, fastparquet 2024.2.0, numpy 1.26.4, pandas 2.2.1, pyarrow 14.0.2, lightning 2.3.3, scikit-learn 1.5.0, tqdm 4.66.4, wandb 0.17.0, torch 2.7.1, torch-geometric, pyg-lib, torch-scatter, torch-sparse torch-cluster, torch-spline-conv, openbabel
 - OS: any OS compatible with the above dependencies, tested on Linux Ubuntu 22.10, Linux Fedora 40 and macOS 15 (CPU only)
 - GPU: CUDA support required when using GPU, CPU only is supported for macOS (sufficient for inference)
 

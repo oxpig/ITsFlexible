@@ -21,7 +21,7 @@ setup(
         'numpy==1.26.4',
         'pandas==2.2.1',
         'pyarrow==14.0.2',
-        'lightning==2.2.5',
+        'lightning==2.3.3',
         'scikit-learn==1.5.0',
         'tqdm==4.66.4',
         'wandb==0.17.0',
