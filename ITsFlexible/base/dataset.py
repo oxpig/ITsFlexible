@@ -473,6 +473,11 @@ class LoopGraphDataSet(Dataset):
 
         prot_df = pdb_df[pdb_df['chain_id'].isin(protein_chains)]
 
+        # select CA atoms only, this is necessary if .parquet are generated with all atoms
+        # here .parquet is generate with CA only, but keep incase of preexisting .parquet files 
+        prot_df = prot_df[prot_df.atom_name == 'CA']
+        prot_df = prot_df.reset_index(drop=True)
+
         # generate graph
         graph_dict = self._generate_graph_dict(
             prot_df,
