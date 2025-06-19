@@ -11,7 +11,7 @@ from ITsFlexible.models.egnn_model import flexEGNN
 from ITsFlexible.base.dataset import LoopGraphDataSet
 
 
-def main(dataset_path, predictor, accelerator):
+def main(dataset_path, predictor, accelerator, batch_size):
     config_path = f'../ITsFlexible/trained_model/config_{predictor}.yaml'
     checkpoint_path = f'../ITsFlexible/trained_model/align_{predictor}_top.ckpt'
 
@@ -30,7 +30,7 @@ def main(dataset_path, predictor, accelerator):
             **config['dataset_params']
             )
     ds.populate(input_file=dataset_path)
-    loader = GeoDataLoader(ds, batch_size=32, num_workers=4, shuffle=False)
+    loader = GeoDataLoader(ds, batch_size=batch_size, num_workers=4, shuffle=False)
 
     trainer = pl.Trainer(logger=False, accelerator=accelerator)
     preds = trainer.predict(
@@ -47,7 +47,8 @@ parser = argparse.ArgumentParser(description='Predict CDR3 flexibility')
 parser.add_argument('--dataset', type=str, help='Path to dataset', default='../data/CDRH3_test_align_loop.csv')
 parser.add_argument('--predictor', type=str, help='Predictor type', default='loop')
 parser.add_argument('--accelerator', type=str, help='Accelerator type', default='auto')
+parser.add_argument('--batch_size', type=int, help='Batch size for prediction', default=32)
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    main(args.dataset, args.predictor, args.accelerator)
+    main(args.dataset, args.predictor, args.accelerator, args.batch_size)
