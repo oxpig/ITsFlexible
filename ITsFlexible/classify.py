@@ -5,6 +5,7 @@ import yaml
 from collections import defaultdict
 import pytorch_lightning as pl
 from torch_geometric.loader import DataLoader as GeoDataLoader
+import torch
 from ITsFlexible.models.egnn_model import flexEGNN
 from ITsFlexible.base.dataset import LoopGraphDataSet
 
@@ -58,10 +59,12 @@ def classify(infile=None,
     ds.populate(input_file=infile)
     loader = GeoDataLoader(ds, batch_size=32, num_workers=4, shuffle=False)
 
-    trainer = pl.Trainer(
-        logger=False,
-        accelerator=accelerator
-    )
+    if (accelerator == 'auto' and not torch.cuda.is_available()) or accelerator == 'cpu':
+        trainer = pl.Trainer(logger=False, accelerator='cpu')
+    else:
+        # Force devices=1 to use only one GPU/device
+        trainer = pl.Trainer(logger=False, accelerator=accelerator, devices=1)
+
     preds = trainer.predict(
         model=model, dataloaders=loader, return_predictions=True
         )

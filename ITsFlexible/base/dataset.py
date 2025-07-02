@@ -453,7 +453,12 @@ class LoopGraphDataSet(Dataset):
 
         # check if typed file exists
         elif typed_pdb.exists() and not force_recalc:
-            pdb_df = pd.read_parquet(typed_pdb)
+            try:
+                pdb_df = pd.read_parquet(typed_pdb)
+            except Exception as e: # corrupt parquet file, write new one
+                pdb_df = utils.parse_pdb_to_parquet(
+                    protloop_def['pdb'], typed_pdb, lmg_typed=False, ca=True
+                    )
 
         # if not create and save typed files
         else:
