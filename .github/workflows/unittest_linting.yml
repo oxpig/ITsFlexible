@@ -26,8 +26,8 @@ jobs:
     - name: Create conda env with Python 3.10
       run: |
         conda create -y -n myenv python=3.10
-        echo "source activate myenv" >> $GITHUB_ENV
-        echo "$CONDA/envs/myenv/bin" >> $GITHUB_PATH
+        source ~/miniconda/etc/profile.d/conda.sh
+        conda activate myenv
 
     - name: Add conda to system path
       run: |
