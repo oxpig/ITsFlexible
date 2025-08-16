@@ -14,7 +14,11 @@
 </div>
 
 
-ITsFlexible is a Python package for classifying the conformational flexibility of antibody and TCR CDR3s and loop motifs with identical secondary structures (loops bounded between two antiparallel beta-strands) across all proteins. Loops are labelled as flexible if they are predicted to adopt multiple conformations and rigid if they are predicted to adopt a single conformation. A conformations is here defined as an ensemble of structures with a maximum RMSD of 1.25 Å between any two structures.
+ITsFlexible is a Python package for classifying the conformational flexibility of antibody and TCR CDR3s and loop motifs with identical secondary structures (loops bounded between two antiparallel beta-strands) across all proteins. Loops are labelled as flexible if they are predicted to adopt multiple conformations and rigid if they are predicted to adopt a single conformation. A conformations is here defined as an ensemble of structures with a maximum RMSD of 1.25 Å between any two structures. A schematic of the methods is shown below:
+
+<p align="center">
+<img src="figs/overview.png" alt="Overview" width="100%">
+</p>
 
 ## Abstract
 
@@ -29,10 +33,10 @@ conda create -n ITsFlexible_env python=3.10
 conda activate ITsFlexible_env
 ```
 
-Install pytorch 2.7.* with the appropriate version for your system, (see [pytorch.org](https://pytorch.org/get-started/locally/)). For cpu only, use:
+Install pytorch 2.3 with the appropriate version for your system, (see [pytorch.org](https://pytorch.org/get-started/locally/)). For cpu only, use:
 
 ```bash
-pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cpu
+pip install torch==2.3.0 --index-url https://download.pytorch.org/whl/cpu
 ```
 
 Clone the repository and install the package:
@@ -47,7 +51,7 @@ Install torch geometric for the correct version of your system (see [pytorch-geo
 
 ```bash
 pip install torch_geometric
-pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.7.0+cpu.html
+pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
 ```
 
 Install conda dependencies:
@@ -58,7 +62,7 @@ conda install -c conda-forge openbabel
 
 **System requirements:**
 
-- Dependencies: python 3.10, biopandas 0.4.1, biopython 1.83, fastparquet 2024.2.0, numpy 1.26.4, pandas 2.2.1, pyarrow 14.0.2, lightning 2.3.3, scikit-learn 1.5.0, tqdm 4.66.4, wandb 0.17.0, torch 2.7.1, torch-geometric, pyg-lib, torch-scatter, torch-sparse torch-cluster, torch-spline-conv, openbabel
+- Dependencies: python 3.10, biopandas 0.4.1, biopython 1.83, fastparquet 2024.2.0, numpy 1.26.4, pandas 2.2.1, pyarrow 14.0.2, lightning 2.2.5, scikit-learn 1.5.0, tqdm 4.66.4, wandb 0.17.0, torch 2.3.0, torch-geometric, pyg-lib, torch-scatter, torch-sparse torch-cluster, torch-spline-conv, openbabel
 - OS: any OS compatible with the above dependencies, tested on Linux Ubuntu 22.10, Linux Fedora 40 and macOS 15 (CPU only)
 - GPU: CUDA support required when using GPU, CPU only is supported for macOS (sufficient for inference)
 
@@ -103,7 +107,13 @@ GPU use on macOS is not supported use `--accelerator cpu` to run on CPU instead.
 
 ITsFlexible provides two predictors for CDR flexiblity: `loop` and `anchors`. These differ in the way in which structural similarity is defined. For `loop` similarity is calculated by alignment on the loop residues themselves, while `anchors` similarity is calculated by alignment on the Fv residues (flanking the loop). For the `loop` predictor we recommend setting `resi_start` to IMGT residue 107 and `resi_end` to 116. For the `anchors` predictor we recommend setting `resi_start` to 105 and `resi_end` to 118. If input structures are not IMGT numbered the suggested numbers should be changed to point to the residues corresponding to the specified IMGT residues.
 
-ITsFlexible outputs a csv file with an additional column containing the predicted classification score. We recommend interpretation of classification scores for the `loop` predictor as follows. These values are chosen based on the false positive rate (FPR) and false negative rate (FNR) observed for classification across test sets for all CDR3s.
+ITsFlexible outputs a csv file with an additional column containing the predicted classification score. 
+
+| index | pdb | ab_chains | chain | resi_start | resi_end | **preds** |
+| ----- | --- | --------- | ----- | ---------- | -------- | --------- |
+| 0     | /path/to/structure.pdb | labels of all chains included in context (i.e. heavy & light chain) | chain with loop | first residue included in loop | last residue included in loop | **classification score** |
+
+We recommend interpretation of classification scores for the `loop` predictor as follows. These values are chosen based on the false positive rate (FPR) and false negative rate (FNR) observed for classification across test sets for all CDR3s.
 
 | high confidence rigid (FNR <= 0.1)| low confidence rigid (FNR 0.1 - 0.2)| ambiguous | low confidence flexible (FPR 0.1 - 0.2) | high confidence flexible (FPR <= 0.1) |
 | ---------------------- | --------------------- | ------------------------ | ------------------------ | ------------------------ |
