@@ -28,8 +28,9 @@ def main(dataset_path, predictor, accelerator, batch_size):
                 **config['model_params'])
 
     ds = LoopGraphDataSet(
-            **config['dataset_params']
-            )
+            **config['dataset_params'],
+            predict=True,
+    )
     ds.populate(input_file=dataset_path)
     loader = GeoDataLoader(ds, batch_size=batch_size, num_workers=4, shuffle=False)
 
